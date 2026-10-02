@@ -1006,9 +1006,8 @@ function pickPaymentMethod(cb){
   document.body.appendChild(ov);
 }
 
-/* shared records: bookings/jobs created in chat with Muse live in ledger.json on the site.
-   The app merges them into the dashboard (marked "Muse") for complete records + monthly tracking. */
-function ledgerUrl(){return 'ledger.json?v='+Date.now()}
+/* shared records: bookings/jobs created in chat with Muse are served via the authenticated API now. */
+function ledgerUrl(){return null}
 var syncing=false;
 function syncPull(manual){
   if(syncing)return;syncing=true;
@@ -1157,7 +1156,7 @@ function renderQuotes(){
   }).join(''):'<div class="card empty">No saved quotes yet — build one above and tap 💾 Save.</div>';
 }
 function syncQuotes(){
-  fetch('quotes.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(d){
+  apiCall('GET','/ledger-quotes',null,true).then(function(d){
     if(d&&d.quotes){engineQuotes=d.quotes;renderQuotes();renderDash()}
   }).catch(function(){});
 }
