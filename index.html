@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#112844" />
+  <link rel="icon" href="data:," />
+  <title>Booking Page Template</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600&display=swap');
+
+    :root {
+      color-scheme: light dark;
+      --page: #eef3f7;
+      --paper: #ffffff;
+      --paper-soft: #f7f9fb;
+      --ink: #122235;
+      --muted: #526477;
+      --line: #d5dee7;
+      --navy: #102b4d;
+      --navy-2: #17416d;
+      --orange: #ef741d;
+      --orange-ink: #8c3600;
+      --orange-soft: #fff0e4;
+      --success: #15715b;
+      --success-soft: #e8f6f1;
+      --shadow: 0 18px 50px rgba(16, 43, 77, .12);
+      --input: #ffffff;
+      --focus: rgba(239, 116, 29, .28);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #09131f;
+        --paper: #101f2e;
+        --paper-soft: #142638;
+        --ink: #f0f4f8;
+        --muted: #b5c1cd;
+        --line: #2d4154;
+        --navy: #b9d7f7;
+        --navy-2: #d7e9fb;
+        --orange: #ff9347;
+        --orange-ink: #ffc79d;
+        --orange-soft: #3b251a;
+        --success: #79d6bb;
+        --success-soft: #15332f;
+        --shadow: 0 22px 60px rgba(0, 0, 0, .3);
+        --input: #0b1927;
+        --focus: rgba(255, 147, 71, .3);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 0; }
+    body {
+      margin: 0;
+      min-width: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+
+    .page-shell {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      padding: clamp(18px, 4vw, 44px) clamp(14px, 4vw, 28px) 48px;
+    }
+
+    .booking, .builder {
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .booking { border-radius: 18px; }
+    .builder { border-radius: 14px; padding: clamp(22px, 5vw, 48px); }
+
+    .booking-head {
+      background: #102b4d;
+      color: #fff;
+      padding: clamp(26px, 6vw, 54px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 28px;
+    }
+
+    .company {
+      margin: 0 0 22px;
+      color: #ffb078;
+      font-size: .79rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 {
+      font-family: "Newsreader", Georgia, serif;
+      letter-spacing: -.025em;
+    }
+
+    h1 {
+      max-width: 640px;
+      margin-bottom: 12px;
+      font-size: clamp(2.25rem, 7vw, 4rem);
+      line-height: .98;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 620px;
+      color: #dbe6f1;
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+    }
+
+    .status-stamp {
+      min-width: 132px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      text-align: center;
+    }
+    .status-stamp svg { display: block; margin: 0 auto 7px; }
+    .status-stamp strong { display: block; font-size: .95rem; }
+
+    .booking-body { padding: clamp(22px, 5vw, 48px); }
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: clamp(20px, 4vw, 38px);
+      align-items: start;
+    }
+
+    .date-panel {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      padding: 20px;
+      background: var(--paper-soft);
+      border-radius: 12px;
+    }
+
+    .calendar-tile {
+      overflow: hidden;
+      border-radius: 9px;
+      background: var(--paper);
+      box-shadow: 0 4px 16px rgba(16,43,77,.1);
+      text-align: center;
+    }
+    .calendar-tile .month {
+      display: block;
+      padding: 5px 6px;
+      background: var(--orange);
+      color: #fff;
+      font-size: .73rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .calendar-tile .day {
+      display: block;
+      padding: 8px 6px 9px;
+      color: var(--navy);
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 2.15rem;
+      line-height: 1;
+    }
+
+    .date-copy .weekday { margin: 0; color: var(--muted); font-size: .92rem; }
+    .date-copy .full-date { margin: 1px 0 3px; color: var(--ink); font-size: 1.18rem; font-weight: 700; }
+    .date-copy .time { margin: 0; color: var(--orange-ink); font-weight: 700; }
+
+    .summary-list { margin: 0; }
+    .summary-row {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .summary-row:first-child { padding-top: 0; }
+    .summary-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    dt { color: var(--muted); }
+    dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+
+    .section { margin-top: clamp(28px, 5vw, 44px); }
+    .section h2 {
+      margin-bottom: 16px;
+      color: var(--navy);
+      font-size: clamp(1.55rem, 4vw, 2rem);
+      line-height: 1.1;
+    }
+
+    .route {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: 14px;
+    }
+    .route-line { position: relative; min-height: 132px; }
+    .route-line::before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      bottom: 15px;
+      left: 15px;
+      width: 2px;
+      background: var(--line);
+    }
+    .route-dot {
+      position: absolute;
+      left: 9px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--paper);
+      border: 4px solid var(--orange);
+    }
+    .route-dot.start { top: 10px; }
+    .route-dot.end { bottom: 10px; border-color: var(--navy-2); }
+    .route-addresses { display: grid; gap: 24px; }
+    .address-block { min-width: 0; }
+    .address-label {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .address-value { margin: 0; font-size: 1.05rem; font-weight: 600; white-space: pre-line; overflow-wrap: anywhere; }
+
+    .notice {
+      margin-top: 28px;
+      padding: 17px 19px;
+      border-radius: 10px;
+      background: var(--orange-soft);
+      color: var(--ink);
+    }
+    .notice strong { color: var(--orange-ink); }
+
+    .section-lead { margin: 0 0 14px; color: var(--muted); }
+
+    .quote-top {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .quote-total {
+      margin: 0;
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(2.4rem, 7vw, 3.4rem);
+      line-height: 1;
+      color: var(--navy);
+    }
+    .quote-caption { margin: 0; color: var(--muted); }
+
+    .reminder-card {
+      display: grid;
+      gap: 4px;
+      padding: 18px 20px;
+      border-radius: 12px;
+      background: var(--paper-soft);
+      border: 1px solid var(--line);
+    }
+    .reminder-kicker {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .reminder-card strong { font-size: 1.25rem; color: var(--orange-ink); }
+    .reminder-card span:last-child { color: var(--muted); font-size: .92rem; }
+
+    .timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+    .timeline li {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .timeline li:last-child { border-bottom: 0; }
+    .tick {
+      display: inline-flex;
+      width: 30px;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--success-soft);
+      color: var(--success);
+      font-weight: 700;
+    }
+    .tick-next { background: var(--paper-soft); color: var(--muted); border: 1px solid var(--line); }
+    .timeline strong { display: block; margin-bottom: 2px; }
+    .timeline p { margin: 0; color: var(--muted); font-size: .93rem; }
+
+    .tips {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .tips li {
+      padding: 16px 18px;
+      border-radius: 12px;
+      background: var(--paper-soft);
+      border: 1px solid var(--line);
+    }
+    .tips strong { display: block; margin-bottom: 6px; }
+    .tip-num {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--orange);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    .tips p { margin: 0; color: var(--muted); font-size: .92rem; }
+
+    .tagline {
+      margin: 18px 0 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: .9rem;
+      font-style: italic;
+    }
+
+    @media (max-width: 700px) {
+      .tips { grid-template-columns: 1fr; }
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      padding: 11px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .button-primary { background: var(--orange); color: #fff; }
+    .button-primary:hover { background: #d96111; }
+    .button-secondary { background: transparent; color: var(--navy); border-color: var(--line); }
+    .button-secondary:hover { background: var(--paper-soft); }
+    .button svg { flex: 0 0 auto; }
+
+    .contact-strip {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .contact-links { display: flex; flex-wrap: wrap; gap: 14px; }
+    .contact-links a { color: var(--navy); font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+    .builder-intro { max-width: 680px; }
+    .builder h1 { color: var(--navy); font-size: clamp(2.2rem, 7vw, 3.7rem); }
+    .builder .lead { color: var(--muted); }
+    .builder-note {
+      margin: 22px 0 30px;
+      padding: 14px 16px;
+      border-radius: 9px;
+      background: var(--success-soft);
+      color: var(--ink);
+    }
+    .builder-note strong { color: var(--success); }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .field { min-width: 0; }
+    .field.span-2 { grid-column: 1 / -1; }
+    label { display: block; margin-bottom: 7px; color: var(--ink); font-size: .9rem; font-weight: 700; }
+    .hint { display: block; margin-top: 6px; color: var(--muted); font-size: .8rem; }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--input);
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+    }
+    textarea { min-height: 84px; resize: vertical; }
+    input:focus, textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--focus); }
+    input::placeholder, textarea::placeholder { color: var(--muted); opacity: .75; }
+    .builder-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+    .result {
+      display: none;
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 10px;
+      background: var(--paper-soft);
+    }
+    .result.is-visible { display: block; }
+    .result h2 { margin-bottom: 12px; font-size: 1.5rem; }
+    .result textarea { min-height: 116px; font-size: .86rem; }
+    .copy-status { min-height: 24px; margin: 10px 0 0; color: var(--success); font-weight: 700; }
+    .error { display: none; margin: 16px 0 0; color: #b6412e; font-weight: 700; }
+    .error.is-visible { display: block; }
+
+    .empty-state {
+      max-width: 620px;
+      margin: 14vh auto;
+      padding: 34px;
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    [hidden] { display: none !important; }
+
+    @media (max-width: 700px) {
+      .page-shell { padding-inline: 10px; }
+      .booking-head { grid-template-columns: 1fr; align-items: start; }
+      .status-stamp { width: fit-content; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 9px 12px; }
+      .status-stamp svg { margin: 0; }
+      .status-stamp strong { font-size: .86rem; }
+      .top-grid { grid-template-columns: 1fr; }
+      .summary-list { padding-top: 4px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.span-2 { grid-column: auto; }
+      .contact-strip { align-items: flex-start; flex-direction: column; }
+      .actions .button { flex: 1 1 100%; }
+    }
+
+    @media (max-width: 390px) {
+      .booking-head, .booking-body, .builder { padding: 22px 18px; }
+      .date-panel { grid-template-columns: 72px minmax(0, 1fr); gap: 13px; padding: 15px; }
+      .summary-row { grid-template-columns: 92px minmax(0, 1fr); gap: 10px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page-shell { width: 100%; padding: 0; }
+      .booking { border-radius: 0; box-shadow: none; }
+      .actions { display: none; }
+      .contact-strip { margin-top: 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="builder" id="builder" hidden aria-labelledby="builder-title">
+      <div class="builder-intro">
+        <h1 id="builder-title">Create a client booking link</h1>
+        <p class="lead">Enter the confirmed move details. The generated link opens a client-ready booking page with change and calendar options—no second confirmation request.</p>
+      </div>
+
+      <p class="builder-note"><strong>Host once, reuse for every booking.</strong> Paste the permanent URL where this file is hosted, then fill in the job.</p>
+
+      <form id="link-form" novalidate>
+        <div class="form-grid">
+          <div class="field span-2">
+            <label for="base-url">Permanent booking-page URL</label>
+            <input id="base-url" name="base-url" type="url" inputmode="url" autocomplete="url" aria-label="Permanent booking-page URL" placeholder="https://your-domain.ca/booking/" required />
+            <small class="hint">Use the exact URL supplied by whoever hosts this file.</small>
+          </div>
+          <div class="field span-2">
+            <label for="client">Client name(s)</label>
+            <input id="client" name="client" autocomplete="name" aria-label="Client name" placeholder="Client name" required />
+          </div>
+          <div class="field">
+            <label for="date">Move date</label>
+            <input id="date" name="date" type="date" aria-label="Move date" required />
+          </div>
+          <div class="field">
+            <label for="time">Start time</label>
+            <input id="time" name="time" type="time" aria-label="Start time" required />
+          </div>
+          <div class="field span-2">
+            <label for="pickup">Pickup address</label>
+            <textarea id="pickup" name="pickup" autocomplete="street-address" aria-label="Pickup address" placeholder="Street, city, province, postal code" required></textarea>
+          </div>
+          <div class="field span-2">
+            <label for="dropoff">Drop-off address</label>
+            <textarea id="dropoff" name="dropoff" autocomplete="street-address" aria-label="Drop-off address" placeholder="Street, city, province, postal code" required></textarea>
+          </div>
+          <div class="field">
+            <label for="movers">Number of movers</label>
+            <input id="movers" name="movers" type="number" min="1" max="12" inputmode="numeric" aria-label="Number of movers" placeholder="2" required />
+          </div>
+          <div class="field">
+            <label for="minimum">Minimum booking price ($)</label>
+            <input id="minimum" name="minimum" type="number" min="0" step="0.01" inputmode="decimal" aria-label="Minimum booking price" placeholder="480" required />
+          </div>
+          <div class="field">
+            <label for="hourly">Hourly rate after minimum ($)</label>
+            <input id="hourly" name="hourly" type="number" min="0" step="0.01" inputmode="decimal" aria-label="Hourly rate after minimum" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="duration">Calendar duration (hours)</label>
+            <input id="duration" name="duration" type="number" min="1" max="24" step="0.5" inputmode="decimal" aria-label="Calendar duration" value="3" required />
+          </div>
+          <div class="field span-2">
+            <label for="notes">Booking notes</label>
+            <textarea id="notes" name="notes" aria-label="Booking notes" placeholder="Optional instructions or payment notes"></textarea>
+          </div>
+          <div class="field">
+            <label for="reference">Booking reference</label>
+            <input id="reference" name="reference" aria-label="Booking reference" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="travel">Travel fee included ($)</label>
+            <input id="travel" name="travel" type="number" min="0" step="0.01" inputmode="decimal" aria-label="Travel fee included" placeholder="Optional" />
+          </div>
+        </div>
+        <p class="error" id="form-error" role="alert">Please complete the required fields and enter a valid permanent page URL.</p>
+        <div class="builder-actions">
+          <button class="button button-primary" type="submit">Generate booking link</button>
+          <button class="button button-secondary" type="reset">Clear form</button>
+        </div>
+      </form>
+
+      <section class="result" id="result" aria-live="polite">
+        <h2>Your booking link</h2>
+        <textarea id="generated-link" readonly aria-label="Generated booking link"></textarea>
+        <div class="builder-actions">
+          <button class="button button-primary" id="copy-link" type="button">Copy booking link</button>
+          <a class="button button-secondary" id="preview-link" href="#" target="_blank" rel="noopener">Preview client page</a>
+        </div>
+        <p class="copy-status" id="copy-status"></p>
+      </section>
+    </section>
+
+    <article class="booking" id="booking" hidden aria-labelledby="booking-title">
+      <header class="booking-head">
+        <div>
+          <p class="company">Icando Movers &amp; Transportation</p>
+          <h1 id="booking-title">Your move is booked</h1>
+          <p class="lead" id="welcome">Everything is arranged. Here are your confirmed booking details.</p>
+        </div>
+        <div class="status-stamp" aria-label="Booking confirmed">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5" stroke="#ffb078" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <strong>Confirmed</strong>
+        </div>
+      </header>
+
+      <div class="booking-body">
+        <div class="top-grid">
+          <section class="date-panel" aria-label="Move date and time">
+            <div class="calendar-tile" aria-hidden="true">
+              <span class="month" id="month">—</span>
+              <span class="day" id="day">—</span>
+            </div>
+            <div class="date-copy">
+              <p class="weekday" id="weekday"></p>
+              <p class="full-date" id="full-date"></p>
+              <p class="time" id="display-time"></p>
+            </div>
+          </section>
+
+          <dl class="summary-list">
+            <div class="summary-row"><dt>Crew</dt><dd id="crew"></dd></div>
+            <div class="summary-row"><dt>Minimum</dt><dd id="minimum-display"></dd></div>
+            <div class="summary-row" id="rate-row" hidden><dt>Hourly rate</dt><dd id="hourly-display"></dd></div>
+            <div class="summary-row" id="travel-row" hidden><dt>Travel fee</dt><dd id="travel-display"></dd></div>
+            <div class="summary-row" id="reference-row" hidden><dt>Reference</dt><dd id="reference-display"></dd></div>
+          </dl>
+        </div>
+
+        <section class="section" aria-labelledby="quote-title">
+          <h2 id="quote-title">Quote summary</h2>
+          <div class="quote-top">
+            <p class="quote-total" id="quote-total">—</p>
+            <p class="quote-caption">Minimum total before applicable tax.</p>
+          </div>
+          <dl class="summary-list">
+            <div class="summary-row"><dt>Crew</dt><dd id="quote-crew">—</dd></div>
+            <div class="summary-row"><dt>Minimum</dt><dd id="quote-minimum">—</dd></div>
+            <div class="summary-row" id="quote-travel-row" hidden><dt>Travel &amp; service</dt><dd id="quote-travel"></dd></div>
+            <div class="summary-row" id="quote-additional-row" hidden><dt>Additional time</dt><dd id="quote-additional"></dd></div>
+          </dl>
+        </section>
+
+        <section class="section" aria-labelledby="route-title">
+          <h2 id="route-title">Moving route</h2>
+          <div class="route">
+            <div class="route-line" aria-hidden="true">
+              <span class="route-dot start"></span>
+              <span class="route-dot end"></span>
+            </div>
+            <div class="route-addresses">
+              <div class="address-block">
+                <span class="address-label">Pickup</span>
+                <p class="address-value" id="pickup-display"></p>
+              </div>
+              <div class="address-block">
+                <span class="address-label">Drop-off</span>
+                <p class="address-value" id="dropoff-display"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="payment-title">
+          <h2 id="payment-title">Payment terms</h2>
+          <p class="section-lead">Payment is due after the move is complete.</p>
+          <dl class="summary-list">
+            <div class="summary-row"><dt>E-transfer</dt><dd>Plus 5% GST</dd></div>
+            <div class="summary-row"><dt>Credit card</dt><dd>Plus 3% card fee and 5% GST</dd></div>
+            <div class="summary-row"><dt>Cash</dt><dd>No GST, no invoice</dd></div>
+          </dl>
+        </section>
+
+        <p class="notice" id="notes-display" hidden><strong>Booking note:</strong> <span></span></p>
+
+        <section class="section" aria-labelledby="reminder-title">
+          <h2 id="reminder-title">Move reminder</h2>
+          <p class="section-lead">The calendar file includes one alert, scheduled for the day before your move.</p>
+          <div class="reminder-card">
+            <span class="reminder-kicker">Final check</span>
+            <strong>1 day before</strong>
+            <span>Use “Add to calendar” above to download your reminder.</span>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="next-title">
+          <h2 id="next-title">What happens next</h2>
+          <ol class="timeline">
+            <li>
+              <span class="tick" aria-hidden="true">✓</span>
+              <div><strong>Quote accepted</strong><p>Your moving request has been received and accepted.</p></div>
+            </li>
+            <li>
+              <span class="tick" aria-hidden="true">✓</span>
+              <div><strong>Date and time agreed</strong><p id="timeline-when">Your moving date is confirmed by both sides.</p></div>
+            </li>
+            <li>
+              <span class="tick" aria-hidden="true">✓</span>
+              <div><strong>Booking confirmed</strong><p>Your date is reserved — no further confirmation needed.</p></div>
+            </li>
+            <li>
+              <span class="tick tick-next" aria-hidden="true">•</span>
+              <div><strong>Before your move</strong><p>You’ll receive everything you need for a smooth arrival.</p></div>
+            </li>
+            <li>
+              <span class="tick tick-next" aria-hidden="true">•</span>
+              <div><strong>Moving day</strong><p>Our crew arrives at the confirmed time and gets you moving.</p></div>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" aria-labelledby="tips-title">
+          <h2 id="tips-title">A smoother moving day</h2>
+          <p class="section-lead">Four practical steps that help the crew start on time and protect the things you care about.</p>
+          <ol class="tips">
+            <li><strong><span class="tip-num">01</span>Label the essentials</strong><p>Mark boxes you’ll want opened first at the new place.</p></li>
+            <li><strong><span class="tip-num">02</span>Set aside valuables</strong><p>Keep documents, medication, keys and small valuables with you.</p></li>
+            <li><strong><span class="tip-num">03</span>Clear the route</strong><p>Keep hallways, entrances and parking access open for the crew.</p></li>
+            <li><strong><span class="tip-num">04</span>Flag special items</strong><p>Let us know about fragile, oversized or unusually heavy pieces.</p></li>
+          </ol>
+        </section>
+
+        <div class="actions" aria-label="Booking actions">
+          <button class="button button-primary" id="calendar-button" type="button">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 3v4M8 3v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add to calendar
+          </button>
+          <a class="button button-secondary" id="change-link" href="#">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.83 2.83 0 1 0-4-4L4 16v4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Request a change
+          </a>
+        </div>
+
+        <footer class="contact-strip">
+          <span>Questions before moving day?</span>
+          <div class="contact-links">
+            <a href="tel:+12042295871">204-229-5871</a>
+            <a href="mailto:info@icandomovers.ca">info@icandomovers.ca</a>
+          </div>
+        </footer>
+        <p class="tagline">Moving with care, from first box to final placement.</p>
+      </div>
+    </article>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var COMPANY = "Icando Movers & Transportation";
+      var EMAIL = "info@icandomovers.ca";
+      var TIMEZONE = "America/Winnipeg";
+      var params = new URLSearchParams(window.location.search);
+      var required = ["client", "date", "time", "pickup", "dropoff", "movers", "minimum"];
+      var hasBooking = required.every(function (key) { return params.get(key); });
+
+      function byId(id) { return document.getElementById(id); }
+      function text(id, value) { byId(id).textContent = value; }
+      function safeNumber(value) {
+        var number = Number(value);
+        return Number.isFinite(number) ? number : null;
+      }
+      function money(value) {
+        var number = safeNumber(value);
+        if (number === null) return "";
+        return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: Number.isInteger(number) ? 0 : 2 }).format(number);
+      }
+      function parseLocalDate(value) {
+        var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
+        if (!match) return null;
+        var date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+        if (date.getFullYear() !== Number(match[1]) || date.getMonth() !== Number(match[2]) - 1 || date.getDate() !== Number(match[3])) return null;
+        return date;
+      }
+      function displayTime(value) {
+        var match = /^(\d{1,2}):(\d{2})$/.exec(value || "");
+        if (!match) return value || "";
+        var hour = Number(match[1]);
+        var minute = match[2];
+        if (hour > 23) return value;
+        var suffix = hour >= 12 ? "PM" : "AM";
+        var twelve = hour % 12 || 12;
+        return twelve + ":" + minute + " " + suffix;
+      }
+      function icsEscape(value) {
+        return String(value || "").replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
+      }
+      function foldLine(line) {
+        var out = "";
+        while (line.length > 73) {
+          out += line.slice(0, 73) + "\r\n ";
+          line = line.slice(73);
+        }
+        return out + line;
+      }
+      function localStamp(dateValue, timeValue) {
+        var date = String(dateValue).replace(/-/g, "");
+        var time = String(timeValue).replace(":", "") + "00";
+        return date + "T" + time;
+      }
+      function endStamp(dateValue, timeValue, hours) {
+        var dateParts = dateValue.split("-").map(Number);
+        var timeParts = timeValue.split(":").map(Number);
+        var date = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2], timeParts[0], timeParts[1]));
+        date.setUTCMinutes(date.getUTCMinutes() + Math.round(hours * 60));
+        function pad(v) { return String(v).padStart(2, "0"); }
+        return date.getUTCFullYear() + pad(date.getUTCMonth() + 1) + pad(date.getUTCDate()) + "T" + pad(date.getUTCHours()) + pad(date.getUTCMinutes()) + "00";
+      }
+
+      if (!hasBooking) {
+        byId("builder").hidden = false;
+        var form = byId("link-form");
+        var result = byId("result");
+        var generated = byId("generated-link");
+        var error = byId("form-error");
+
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          error.classList.remove("is-visible");
+          byId("copy-status").textContent = "";
+
+          if (!form.reportValidity()) return;
+          var baseInput = byId("base-url").value.trim();
+          var base;
+          try {
+            base = new URL(baseInput);
+            if (base.protocol !== "https:" && base.protocol !== "http:") throw new Error("Unsupported protocol");
+          } catch (e) {
+            error.classList.add("is-visible");
+            return;
+          }
+
+          var query = new URLSearchParams();
+          ["client", "date", "time", "pickup", "dropoff", "movers", "minimum", "hourly", "duration", "notes", "reference", "travel"].forEach(function (key) {
+            var value = byId(key).value.trim();
+            if (value) query.set(key, value);
+          });
+          base.search = query.toString();
+          base.hash = "";
+          generated.value = base.toString();
+          byId("preview-link").href = base.toString();
+          result.classList.add("is-visible");
+          result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+
+        form.addEventListener("reset", function () {
+          window.setTimeout(function () {
+            result.classList.remove("is-visible");
+            error.classList.remove("is-visible");
+            byId("copy-status").textContent = "";
+          }, 0);
+        });
+
+        byId("copy-link").addEventListener("click", function () {
+          var value = generated.value;
+          if (!value) return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(value).then(function () {
+              byId("copy-status").textContent = "Booking link copied.";
+            }).catch(function () {
+              generated.focus();
+              generated.select();
+              byId("copy-status").textContent = "Link selected—copy it from the field above.";
+            });
+          } else {
+            generated.focus();
+            generated.select();
+            byId("copy-status").textContent = "Link selected—copy it from the field above.";
+          }
+        });
+        return;
+      }
+
+      var client = params.get("client");
+      var dateValue = params.get("date");
+      var timeValue = params.get("time");
+      var pickup = params.get("pickup");
+      var dropoff = params.get("dropoff");
+      var movers = params.get("movers");
+      var minimum = params.get("minimum");
+      var hourly = params.get("hourly") || "";
+      var travel = params.get("travel") || "";
+      var notes = params.get("notes") || "";
+      var reference = params.get("reference") || "";
+      var duration = Math.max(1, Math.min(24, safeNumber(params.get("duration")) || 3));
+      var date = parseLocalDate(dateValue);
+
+      if (!date || !/^([01]?\d|2[0-3]):[0-5]\d$/.test(timeValue) || safeNumber(movers) === null || safeNumber(minimum) === null) {
+        byId("booking").outerHTML = '<section class="empty-state"><h1>We could not read this booking</h1><p>Please ask Icando Movers to resend the booking link.</p><p><a href="tel:+12042295871"><strong>204-229-5871</strong></a></p></section>';
+        return;
+      }
+
+      byId("booking").hidden = false;
+      text("welcome", "Hi " + client + ", your moving date is reserved. Review the details below and let us know only if something needs to change.");
+      text("month", new Intl.DateTimeFormat("en-CA", { month: "short" }).format(date));
+      text("day", String(date.getDate()));
+      text("weekday", new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(date));
+      text("full-date", new Intl.DateTimeFormat("en-CA", { month: "long", day: "numeric", year: "numeric" }).format(date));
+      text("display-time", displayTime(timeValue));
+      text("crew", movers + (String(movers) === "1" ? " mover" : " movers"));
+      text("minimum-display", money(minimum) + " minimum");
+      text("pickup-display", pickup);
+      text("dropoff-display", dropoff);
+
+      if (hourly && safeNumber(hourly) !== null) {
+        byId("rate-row").hidden = false;
+        text("hourly-display", money(hourly) + " per hour");
+      }
+      if (travel && safeNumber(travel) !== null) {
+        byId("travel-row").hidden = false;
+        text("travel-display", money(travel) + " included");
+      }
+      if (reference) {
+        byId("reference-row").hidden = false;
+        text("reference-display", reference);
+      }
+      if (notes) {
+        byId("notes-display").hidden = false;
+        byId("notes-display").querySelector("span").textContent = notes;
+      }
+
+      var minNum = safeNumber(minimum);
+      var hrNum = hourly ? safeNumber(hourly) : null;
+      var trNum = travel ? safeNumber(travel) : null;
+      text("quote-total", money(minimum));
+      text("quote-crew", movers + "-mover crew" + (hrNum !== null ? " · " + money(hourly) + "/hr" : ""));
+      var minHours = (hrNum !== null && hrNum > 0 && trNum !== null) ? (minNum - trNum) / hrNum : null;
+      if (minHours !== null && minHours > 0) {
+        var hoursLabel = Number.isInteger(minHours) ? String(minHours) : minHours.toFixed(1);
+        text("quote-minimum", hoursLabel + " hours · " + money(minNum - trNum));
+      } else {
+        text("quote-minimum", money(minimum));
+      }
+      if (trNum !== null) {
+        byId("quote-travel-row").hidden = false;
+        text("quote-travel", money(travel));
+      }
+      if (hrNum !== null) {
+        byId("quote-additional-row").hidden = false;
+        text("quote-additional", money(hourly) + "/hr");
+      }
+      var whenLine = new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(date) + ", " +
+        new Intl.DateTimeFormat("en-CA", { month: "long", day: "numeric" }).format(date) +
+        " at " + displayTime(timeValue) + " — agreed by both sides.";
+      text("timeline-when", whenLine);
+
+      var changeSubject = "Booking change request — " + client;
+      var changeBody = [
+        "Hello Icando Movers,",
+        "",
+        "I would like to request a change to my confirmed move.",
+        "",
+        "Client: " + client,
+        "Move date: " + new Intl.DateTimeFormat("en-CA", { month: "long", day: "numeric", year: "numeric" }).format(date) + " at " + displayTime(timeValue),
+        reference ? "Reference: " + reference : "",
+        "",
+        "Requested change:",
+        ""
+      ].filter(function (line) { return line !== null; }).join("\n");
+      byId("change-link").href = "mailto:" + EMAIL + "?subject=" + encodeURIComponent(changeSubject) + "&body=" + encodeURIComponent(changeBody);
+
+      byId("calendar-button").addEventListener("click", function () {
+        var descriptionParts = [
+          "Confirmed move with " + COMPANY,
+          movers + (String(movers) === "1" ? " mover" : " movers"),
+          "Minimum booking: " + money(minimum),
+          hourly ? "Hourly rate: " + money(hourly) : "",
+          travel ? "Travel fee included: " + money(travel) : "",
+          "Pickup: " + pickup,
+          "Drop-off: " + dropoff,
+          notes ? "Notes: " + notes : "",
+          "Questions: 204-229-5871 or " + EMAIL
+        ].filter(Boolean).join("\n");
+        var uid = "move-" + dateValue + "-" + timeValue.replace(":", "") + "@icandomovers.ca";
+        var lines = [
+          "BEGIN:VCALENDAR",
+          "VERSION:2.0",
+          "PRODID:-//Icando Movers//Booking//EN",
+          "CALSCALE:GREGORIAN",
+          "METHOD:PUBLISH",
+          "BEGIN:VEVENT",
+          "UID:" + uid,
+          "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""),
+          "DTSTART;TZID=" + TIMEZONE + ":" + localStamp(dateValue, timeValue),
+          "DTEND;TZID=" + TIMEZONE + ":" + endStamp(dateValue, timeValue, duration),
+          "SUMMARY:" + icsEscape("Move with " + COMPANY),
+          "LOCATION:" + icsEscape(pickup),
+          "DESCRIPTION:" + icsEscape(descriptionParts),
+          "BEGIN:VALARM",
+          "TRIGGER:-P1D",
+          "ACTION:DISPLAY",
+          "DESCRIPTION:" + icsEscape("Your move with " + COMPANY + " is tomorrow"),
+          "END:VALARM",
+          "END:VEVENT",
+          "END:VCALENDAR"
+        ].map(foldLine).join("\r\n");
+        var blob = new Blob([lines], { type: "text/calendar;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = "icando-move-" + dateValue + ".ics";
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      });
+    }());
+  </script>
+<script>
+(function(){try{var p=new URLSearchParams(location.search);if(p.get('from')!=='manager')return;var a=document.createElement('a');a.href='manager.html';a.textContent='\u2039 Manager';a.setAttribute('aria-label','Back to manager');a.style.cssText='position:fixed;right:14px;bottom:14px;z-index:9999;background:#0f2a44;color:#fff;font:700 14px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;padding:13px 18px;border-radius:999px;box-shadow:0 8px 22px rgba(15,42,68,.35);text-decoration:none';document.body.appendChild(a)}catch(e){}})();
+</script>
+</body>
+</html>

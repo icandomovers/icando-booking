@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#102b4d" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Icando Crew" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102b4d'/%3E%3Ctext x='32' y='42' font-family='Arial' font-size='30' font-weight='bold' fill='%23f26522' text-anchor='middle'%3EiC%3C/text%3E%3C/svg%3E" />
+  <title>Icando Crew</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+    :root{
+      --navy:#102b4d; --navy2:#17416d; --orange:#f26522; --orange-d:#d9531a;
+      --bg:#eef3f7; --card:#ffffff; --ink:#122235; --muted:#5b6d7f; --line:#d9e1e9;
+      --green:#15715b; --green-soft:#e3f4ee; --amber:#9a6200; --amber-soft:#fdf1dc;
+      --red:#b3261e; --red-soft:#fbe9e7;
+      --tabbar-h: calc(64px + env(safe-area-inset-bottom));
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",sans-serif;font-size:15.5px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:var(--tabbar-h)}
+    button,input,textarea,select{font:inherit}
+    .app-head{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;display:flex;align-items:center;justify-content:space-between}
+    .app-head h1{margin:0;font-size:1.25rem;letter-spacing:-.01em}
+    .app-head .sub{display:block;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#ffb078}
+    .app-head .who{font-size:.85rem;color:#cfe0f0;text-align:right}
+    main{max-width:640px;margin:0 auto;padding:16px 14px 30px}
+    .tab{display:none}
+    .tab.active{display:block;animation:fade .18s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 6px 22px rgba(16,43,77,.07)}
+    .card h3{margin:0 0 4px;font-size:1.05rem}
+    .meta{color:var(--muted);font-size:.88rem;margin:2px 0}
+    .row-badges{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+    .badge{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:#e8eef4;color:var(--navy2)}
+    .badge.green{background:var(--green-soft);color:var(--green)}
+    .badge.amber{background:var(--amber-soft);color:var(--amber)}
+    .badge.red{background:var(--red-soft);color:var(--red)}
+    .btn{display:inline-block;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;text-align:center}
+    .btn.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+    .btn.primary:active{background:var(--orange-d)}
+    .btn.big{width:100%;padding:18px;font-size:1.15rem;border-radius:14px;min-height:68px}
+    .btn.small{padding:8px 13px;font-size:.85rem;border-radius:9px}
+    .btn.danger{color:var(--red);border-color:#f0c4c0}
+    .btn:disabled{opacity:.45;cursor:default}
+    .btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .btn-row .btn{flex:1;min-width:120px}
+    .field{margin:10px 0}
+    .field label{display:block;font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+    .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:1rem;background:#fff;color:var(--ink)}
+    .field input:disabled{background:#f2f5f8;color:var(--muted)}
+    .drow{padding:8px 0;border-bottom:1px dotted var(--line)}
+    .drow:last-child{border-bottom:0}
+    .drow .dl{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+    .drow .dv{font-size:.95rem;line-height:1.5;overflow-wrap:anywhere}
+    .toast{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + 14px);transform:translate(-50%,16px);opacity:0;background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;transition:.2s;pointer-events:none;z-index:50;max-width:calc(100% - 30px);text-align:center;font-weight:600}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+    .tabbar button{border:0;background:none;padding:10px 4px 8px;cursor:pointer;color:var(--muted);font-size:.68rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}
+    .tabbar button .t-ic{font-size:1.3rem;line-height:1}
+    .tabbar button.on{color:var(--orange)}
+    .empty{text-align:center;color:var(--muted);padding:22px 10px}
+    .check-list{display:grid;gap:8px;margin-top:8px}
+    .check{display:flex;align-items:center;gap:10px;background:#f7fafc;border:1px solid var(--line);border-radius:10px;padding:11px 12px;cursor:pointer;font-weight:600}
+    .check input{width:20px;height:20px;accent-color:var(--orange)}
+    .check.dim{opacity:.45}
+    .login-wrap{max-width:420px;margin:8vh auto 0;padding:0 18px}
+    .login-wrap .card{padding:24px}
+    .job-addr{font-weight:600}
+    .steps{margin:8px 0;padding-left:20px}
+    .steps li{margin:6px 0}
+    .spinner{text-align:center;padding:24px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header class="app-head">
+    <h1><span class="sub">Icando Movers</span>Crew</h1>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="who" id="headWho"></div>
+      <button id="refreshBtn" class="icon-btn" title="Refresh schedule" style="background:rgba(255,255,255,.15);border:0;color:#fff;font-size:1.3rem;width:38px;height:38px;border-radius:50%;cursor:pointer">⟳</button>
+    </div>
+  </header>
+  <div id="updateBar" hidden style="padding:10px 16px 0"><button class="btn small block" id="updateBtn" style="width:100%;border-color:#fdba74;color:#c2410c;background:#fff7ed;padding:10px;border-radius:8px">⟳ New version available — tap to update</button></div>
+
+  <!-- Login -->
+  <div id="loginView" class="login-wrap" hidden>
+    <div class="card">
+      <h3>Welcome to Icando Crew</h3>
+      <p class="meta">Log in with your username and password.</p>
+      <div class="field"><label>Username</label>
+        <input id="loginUser" placeholder="Your username" autocomplete="username" autocapitalize="none" />
+      </div>
+      <div class="field"><label>Password</label>
+        <input id="loginPass" type="password" placeholder="Your password" autocomplete="current-password" />
+      </div>
+      <button class="btn primary" id="loginUpBtn" style="width:100%">Log in</button>
+      <p class="meta" style="text-align:center;margin:14px 0 6px">— or —</p>
+      <div class="field"><label>Login link</label>
+        <input id="loginLink" placeholder="Paste the full link here" autocomplete="off" />
+      </div>
+      <button class="btn" id="loginLinkBtn" style="width:100%">Log in with link</button>
+      <p class="meta" id="loginErr" style="color:var(--red);min-height:1.2em"></p>
+    </div>
+  </div>
+
+  <!-- App -->
+  <main id="appView" hidden>
+    <section class="tab active" id="tab-schedule">
+      <div id="jobList"><div class="spinner">Loading your schedule…</div></div>
+    </section>
+
+    <section class="tab" id="tab-clock">
+      <div class="card">
+        <div class="row-badges"><span class="badge" id="clockBadge">Status</span></div>
+        <h3 id="clockTitle">Clock</h3>
+        <p class="meta" id="clockSub">Checking…</p>
+        <div class="field" id="clockJobWrap" hidden><label>Job (optional)</label><select id="clockJob"></select></div>
+        <button class="btn primary big" id="clockBtn">Clock In</button>
+        <p class="meta" style="margin-top:10px">Your location is recorded when you clock in and out. If location is off, clocking still works.</p>
+      </div>
+      <div class="card">
+        <h3>Today</h3>
+        <div id="todayRows"><p class="meta">—</p></div>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-pay">
+      <div class="card">
+        <div class="row-badges"><span class="badge">Pay</span></div>
+        <h3>My pay</h3>
+        <p class="meta">Your hours and estimated pay. Read-only — talk to Ifeanyi if anything looks off.</p>
+        <div class="field"><label>Pay period</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn small" id="payPrev">‹ Prev</button>
+            <div id="payLabel" style="flex:1;text-align:center;font-weight:700"></div>
+            <button class="btn small" id="payNext">Next ›</button>
+          </div>
+        </div>
+        <div id="payRows"><div class="spinner">Loading…</div></div>
+        <div id="payTotals"></div>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-me">
+      <div class="card">
+        <div class="row-badges"><span class="badge">Me</span></div>
+        <h3>My info</h3>
+        <p class="meta">Keep this up to date — your manager sees changes right away.</p>
+        <div class="field"><label>Name</label><input id="meName" disabled /></div>
+        <div class="field"><label>Phone</label><input id="mePhone" type="tel" /></div>
+        <div class="field"><label>Email</label><input id="meEmail" type="email" /></div>
+        <div class="field"><label>Home address</label><input id="meAddress" /></div>
+        <button class="btn primary" id="meSave" style="width:100%">Save changes</button>
+      </div>
+      <div class="card">
+        <h3>Notifications</h3>
+        <p class="meta" id="pushStatus">Not set up on this phone yet.</p>
+        <button class="btn" id="pushBtn" style="width:100%">Enable notifications</button>
+        <div class="check-list" id="pushToggles">
+          <label class="check dim"><input type="checkbox" data-pref="job_assigned" disabled /> New jobs assigned</label>
+          <label class="check dim"><input type="checkbox" data-pref="job_changed" disabled /> Job changes</label>
+          <label class="check dim"><input type="checkbox" data-pref="pay_summary" disabled /> Pay summaries</label>
+          <label class="check dim"><input type="checkbox" data-pref="clock_reminders" disabled /> Clock reminders</label>
+        </div>
+        <div id="crew-channels" style="margin-top:12px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Change password</h3>
+        <p class="meta">Pick something you'll remember. Minimum 4 characters.</p>
+        <div class="field"><label>Current password</label><input id="pwCur" type="password" autocomplete="current-password" /></div>
+        <div class="field"><label>New password</label><input id="pwNew" type="password" autocomplete="new-password" /></div>
+        <div class="field"><label>Confirm new password</label><input id="pwNew2" type="password" autocomplete="new-password" /></div>
+        <button class="btn" id="pwChangeBtn" style="width:100%">Change password</button>
+        <p class="meta" id="pwMsg" style="min-height:1.2em"></p>
+      </div>
+      <div class="card">
+        <h3>Install this app</h3>
+        <div id="installSteps"></div>
+      </div>
+      <button class="btn danger" id="logoutBtn" style="width:100%">Log out</button>
+    </section>
+  </main>
+
+  <nav class="tabbar" id="tabbar" aria-label="Crew sections" hidden>
+    <button data-tab="tab-schedule" class="on"><span class="t-ic">📅</span>Schedule</button>
+    <button data-tab="tab-clock"><span class="t-ic">⏱</span>Clock</button>
+    <button data-tab="tab-pay"><span class="t-ic">🧾</span>Pay</button>
+    <button data-tab="tab-me"><span class="t-ic">👤</span>Me</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* Icando Crew app — staff frontend for the operations database. */
+var API=window.location.origin+'/.netlify/functions/api';
+var VAPID_PUBLIC='BDrIexmy9hICnNn_URMoYAjJrkSGWNpTeiF00fdRGHrov_JA5fz-s__Kj2ZXWLVwdIQSNu2ptz2dbHSwgZQkhF8';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var toastT=null;
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show')},2600)}
+function money(n){return '$'+Number(n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtDate(ymd){if(!ymd)return '';var p=String(ymd).slice(0,10).split('-');if(p.length<3)return ymd;var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return M[+p[1]-1]+' '+ +p[2]+', '+p[0]}
+function fmtTime(iso){if(!iso)return '';try{return new Date(iso).toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'})}catch(e){return ''}}
+function fmtDay(iso){try{return new Date(iso).toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}catch(e){return ''}}
+function todayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+/* auth */
+function getToken(){try{return localStorage.getItem('icando_crew_token')||''}catch(e){return ''}}
+function setToken(t){try{if(t)localStorage.setItem('icando_crew_token',t);else localStorage.removeItem('icando_crew_token')}catch(e){}}
+function apiCrew(method,path,body){
+  return fetch(API+path,{method:method,headers:{'Content-Type':'application/json','x-crew-token':getToken()},body:body?JSON.stringify(body):undefined}).then(function(r){
+    if(r.status===401){logout(true);throw{auth:true}}
+    return r.json().then(function(d){
+      if(!r.ok)throw{msg:(d&&(d.error||d.message))||'Something went wrong'};
+      return d;
+    });
+  });
+}
+function doAuth(payload){
+  $('loginErr').textContent='';
+  return fetch(API+'/crew-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(function(r){
+    return r.json().then(function(d){
+      if(!r.ok||!d.token)throw new Error((d&&(d.error||d.message))||'Login failed');
+      return d;
+    });
+  }).then(function(d){
+    setToken(d.token);
+    if(d.crew&&d.crew.name)$('headWho').textContent=d.crew.name;
+    enterApp();
+  }).catch(function(){ $('loginErr').textContent='Login failed — check your username and password.'; });
+}
+function logout(silent){
+  setToken('');
+  $('appView').hidden=true; $('tabbar').hidden=true; $('loginView').hidden=false;
+  $('headWho').textContent='';
+  document.querySelectorAll('.tabbar button').forEach(function(b){b.classList.remove('on')});
+  document.querySelector('[data-tab="tab-schedule"]').classList.add('on');
+  document.querySelectorAll('.tab').forEach(function(s){s.classList.remove('active')});
+  $('tab-schedule').classList.add('active');
+  if(!silent)toast('Logged out');
+}
+function tokenFromLink(v){
+  v=String(v||'').trim(); if(!v)return '';
+  var m=v.match(/#t=([^&\s]+)/)||v.match(/[?&]t=([^&\s]+)/);
+  return m?m[1]:v;
+}
+var _pingTimer=null;
+function startHeartbeat(){
+  // Ping every 2 min while the app is open — manager sees live presence.
+  function ping(){
+    if(!getToken())return;
+    apiCrew('POST','/crew/me/ping',{}).catch(function(){});
+  }
+  ping();
+  if(_pingTimer)clearInterval(_pingTimer);
+  _pingTimer=setInterval(ping, 120000);
+  // Also ping when coming back to foreground.
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden && getToken()) ping();
+  });
+}
+/* app self-update: iOS home-screen apps don't revalidate the page, so check
+   version.json (no-store) on launch and whenever the app comes to the front. */
+var APP_VERSION='2026-10-02w';
+var lastVerCheck=0;
+function checkAppVersion(){
+  var now=Date.now();if(now-lastVerCheck<5*60*1000)return;lastVerCheck=now;
+  fetch('version.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){
+    if(d&&d.v&&d.v!==APP_VERSION){var b=$('updateBar');if(b)b.hidden=false;}
+  }).catch(function(){/* offline — try next time */});
+}
+function enterApp(){
+  $('loginView').hidden=true; $('appView').hidden=false; $('tabbar').hidden=false;
+  loadMe(); loadJobs(); refreshClock(); loadPay(); startHeartbeat(); checkAppVersion();
+  // Refresh jobs when the app comes back to the foreground (manager may have changed times/details).
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden && getToken()){ loadJobs(); refreshClock(); checkAppVersion(); }
+  });
+}
+$('updateBtn').addEventListener('click',function(){
+  window.location.href='staff.html?v='+Date.now();
+});
+
+/* tabs */
+document.querySelectorAll('.tabbar button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.tabbar button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    document.querySelectorAll('.tab').forEach(function(s){s.classList.remove('active')});
+    $(b.getAttribute('data-tab')).classList.add('active');
+    var t=b.getAttribute('data-tab');
+    if(t==='tab-schedule')loadJobs();
+    if(t==='tab-clock')refreshClock();
+    if(t==='tab-pay')loadPay();
+    if(t==='tab-me'){loadMe();refreshPushUI();renderInstallGuide();}
+  });
+});
+
+/* GPS — silent capture; clocking works even when denied */
+function getPos(){
+  return new Promise(function(res){
+    if(!navigator.geolocation){res(null);return}
+    var done=false;
+    function fin(v){if(!done){done=true;res(v)}}
+    try{
+      navigator.geolocation.getCurrentPosition(function(p){
+        fin({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy});
+      },function(){fin(null)},{timeout:8000,maximumAge:60000});
+      setTimeout(function(){fin(null)},9000);
+    }catch(e){fin(null)}
+  });
+}
+
+/* schedule */
+var jobsCache=[];
+function jobStatusBadge(j){
+  if(j.status==='completed'||j.ended_at)return '<span class="badge green">Done</span>';
+  if(j.status==='cancelled')return '<span class="badge red">Cancelled</span>';
+  return '<span class="badge amber">Upcoming</span>';
+}
+function loadJobs(){
+  var box=$('jobList'); box.innerHTML='<div class="spinner">Loading your schedule…</div>';
+  apiCrew('GET','/crew/me/jobs').then(function(jobs){
+    jobsCache=jobs||[];
+    var t=todayISO();
+    jobsCache.sort(function(a,b){
+      var ad=String(a.date||''),bd=String(b.date||'');
+      var af=ad<t?1:0,bf=bd<t?1:0;
+      return (af-bf)||(ad<bd?-1:ad>bd?1:0);
+    });
+    if(!jobsCache.length){box.innerHTML='<div class="card empty">No jobs yet — new assignments will show up here.</div>';return}
+    box.innerHTML=jobsCache.map(function(j){
+      var mates=(j.crew_list||[]).map(function(c){return c.name}).filter(function(n){return n});
+      var win=[j.start_time,j.end_time].filter(Boolean).map(fmtTime).join(' – ');
+      var resp=j.my_response;
+      var h='<div class="card" data-jobid="'+j.id+'"><div class="row-badges">'+jobStatusBadge(j)+'<span class="meta">'+esc(fmtDate(j.date))+(win?' · '+esc(win):'')+'</span></div>';
+      h+='<h3>'+esc(j.client_name||'Job')+'</h3>';
+      if(j.pickup||j.dropoff)h+='<p class="meta job-addr">'+esc(j.pickup||'')+(j.pickup&&j.dropoff?' → ':'')+esc(j.dropoff||'')+'</p>';
+      var yardMeet=j.yard_meet, yardTxt;
+      if(yardMeet&&/^\d{4}-\d{2}-\d{2}T/.test(String(yardMeet))){
+        yardTxt=fmtTime(yardMeet)+' at 463 Dawson Road North, Winnipeg, MB';
+      } else {
+        yardTxt=yardMeet||'463 Dawson Road North, Winnipeg, MB';
+      }
+      h+='<p class="meta"><b>Meet at yard:</b> '+esc(yardTxt)+'</p>';
+      if(j.start_time)h+='<p class="meta"><b>Be at pickup by:</b> '+esc(fmtTime(j.start_time))+'</p>';
+      if(mates.length)h+='<p class="meta">Crew: '+esc(mates.join(', '))+'</p>';
+      if(j.job_type)h+='<p class="meta">Type: '+esc(j.job_type)+'</p>';
+      if(j.truck)h+='<p class="meta">Truck: '+esc(j.truck)+'</p>';
+      if(j.equipment)h+='<p class="meta">Equipment: '+esc(j.equipment)+'</p>';
+      if(j.access_notes)h+='<p class="meta"><b>Access:</b> '+esc(j.access_notes)+'</p>';
+      if(j.estimated_hours)h+='<p class="meta">Est. '+esc(String(j.estimated_hours))+'h</p>';
+      if(j.client_phone)h+='<p class="meta"><b>Client:</b> <a href="tel:'+esc(j.client_phone)+'">'+esc(j.client_phone)+'</a></p>';
+      if(j.special_instructions)h+='<p class="meta" style="background:#fff7ed;border-left:3px solid #f97316;padding:8px 10px;border-radius:0 6px 6px 0"><b>📝 Note:</b> '+esc(j.special_instructions)+'</p>';
+      if(j.schedule_note)h+='<p class="meta">'+esc(j.schedule_note)+'</p>';
+      if(j.started_at)h+='<p class="meta">Started '+esc(fmtDay(j.started_at))+' '+esc(fmtTime(j.started_at))+'</p>';
+      if(j.ended_at)h+='<p class="meta">Ended '+esc(fmtDay(j.ended_at))+' '+esc(fmtTime(j.ended_at))+(j.billable_hours?' · '+Number(j.billable_hours).toFixed(2)+'h billable':'')+'</p>';
+      h+='<div class="btn-row">';
+      if(!resp&&j.status!=='cancelled'&&j.status!=='completed'){
+        h+='<button class="btn small primary" data-act="accept" data-id="'+j.id+'">Accept</button>';
+        h+='<button class="btn small danger" data-act="reject" data-id="'+j.id+'">Decline</button>';
+      }else if(resp){
+        h+='<span class="badge '+(resp.response==='accept'?'green':'red')+'">'+(resp.response==='accept'?'Accepted':'Declined')+'</span>';
+        if(resp.response==='accept'&&j.status!=='cancelled'&&j.status!=='completed'&&!j.ended_at){
+          h+='<button class="btn small" data-act="resched" data-id="'+j.id+'">🔄 Reschedule</button>';
+          // Release is blocked within 24 hours of the job — crew must call the manager instead.
+          var jobStart=j.start_time?new Date(j.start_time).getTime():0;
+          var hoursUntil=jobStart?(jobStart-Date.now())/(1000*60*60):999;
+          if(hoursUntil>24){
+            h+='<button class="btn small danger" data-act="release" data-id="'+j.id+'">Release job</button>';
+          } else if(jobStart){
+            h+='<p class="meta" style="color:#c62828">⚠️ Within 24h — call Ifeanyi to release this job</p>';
+          }
+        }
+      }
+      if(!j.started_at&&!j.ended_at&&j.status!=='cancelled'&&j.status!=='completed'){
+        h+='<p class="meta" style="color:#666;font-size:12px;margin:4px 0">⏰ Clock in at the yard first (Clock tab), then tap Start when you reach the client.</p>';
+        h+='<button class="btn small" data-act="start" data-id="'+j.id+'">▶ Start job</button>';
+      }
+      if(j.started_at&&!j.ended_at&&j.status!=='cancelled'){
+        h+='<button class="btn small" data-act="end" data-id="'+j.id+'">End job</button>';
+      }
+      if(j.price&&j.payment_status!=='paid'&&j.ended_at){
+        h+='<button class="btn small primary" data-act="collect" data-id="'+j.id+'">Collect payment</button>';
+      }
+      h+='</div></div>';
+      return h;
+    }).join('');
+    // Deep link: scroll to the job from a notification tap.
+    if(window._deepLinkJobId){
+      var target=box.querySelector('[data-jobid="'+window._deepLinkJobId+'"]');
+      if(target){
+        setTimeout(function(){
+          target.scrollIntoView({behavior:'smooth',block:'center'});
+          target.style.outline='3px solid #f26522';target.style.outlineOffset='4px';
+          setTimeout(function(){target.style.outline=''},2500);
+        },300);
+      }
+      window._deepLinkJobId=null;
+    }
+  }).catch(function(e){ if(!e.auth)box.innerHTML='<div class="card empty">Could not load your schedule. Check your connection and try again.</div>'; });
+}
+$('jobList').addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b)return;
+  var id=b.getAttribute('data-id'),act=b.getAttribute('data-act');
+  if(act==='accept'){
+    b.disabled=true;
+    apiCrew('POST','/crew/me/jobs/'+id+'/respond',{response:'accept'}).then(function(){toast('Job accepted');loadJobs()}).catch(function(){b.disabled=false;toast('Could not save — try again')});
+  }else if(act==='reject'){
+    var reason=prompt('Why are you declining? (your manager will see this)')||'';
+    if(reason===null)return;
+    b.disabled=true;
+    apiCrew('POST','/crew/me/jobs/'+id+'/respond',{response:'reject',reason:reason}).then(function(){toast('Declined');loadJobs()}).catch(function(){b.disabled=false;toast('Could not save — try again')});
+  }else if(act==='resched'){
+    var newDate=prompt('What date works for you instead? (YYYY-MM-DD)\nLeave blank if you just need a different time.')||'';
+    if(newDate===null)return;
+    var reason=prompt('Why do you need to reschedule? (your manager will see this)')||'';
+    if(reason===null||!reason.trim()){toast('A reason is required');return}
+    b.disabled=true;
+    apiCrew('POST','/crew/me/jobs/'+id+'/request-change',{kind:'reschedule',reason:reason.trim(),new_date:newDate.trim()||undefined}).then(function(){toast('Reschedule request sent to your manager');loadJobs()}).catch(function(){b.disabled=false;toast('Could not send — try again')});
+  }else if(act==='release'){
+    var reason=prompt('Why do you need to give up this job? (your manager will see this)')||'';
+    if(reason===null||!reason.trim()){toast('A reason is required');return}
+    if(!confirm('Release this job? Your manager will be notified and will find a replacement.'))return;
+    b.disabled=true;
+    apiCrew('POST','/crew/me/jobs/'+id+'/request-change',{kind:'release',reason:reason.trim()}).then(function(){toast('Release request sent — manager notified');loadJobs()}).catch(function(){b.disabled=false;toast('Could not send — try again')});
+  }else if(act==='start'){
+    if(!confirm('Confirm you are at the client location and have met the client?\n\nThis starts the billable clock. Only tap Start if you have already clocked in at the yard.'))return;
+    b.disabled=true; b.textContent='Starting…';
+    apiCrew('POST','/crew/me/jobs/'+id+'/start',{}).then(function(){
+      toast('Job started — billable clock running'); loadJobs();
+    }).catch(function(){b.disabled=false;b.textContent='▶ Start job';toast('Could not start — try again')});
+  }else if(act==='end'){
+    if(!confirm('End this job now? This stops the billable hours and alerts your manager.'))return;
+    b.disabled=true; b.textContent='Ending…';
+    getPos().then(function(pos){
+      var body={}; if(pos){body.lat=pos.lat;body.lng=pos.lng}
+      return apiCrew('POST','/crew/me/jobs/'+id+'/end',body);
+    }).then(function(r){
+      toast('Job ended'+(r.billable_hours?' · '+Number(r.billable_hours).toFixed(2)+'h':'')+(r.amount?' · $'+Number(r.amount).toFixed(2):'')+' — manager notified');
+      setTimeout(function(){
+        if(confirm('⏰ Remember to CLOCK OUT when you\'re back at the yard (or at drop-off if heading home).\n\nTap OK to clock out now, or Cancel to do it later.')) {
+          showTab('tab-clock');
+        }
+      }, 800);
+      loadJobs();
+    }).catch(function(err){b.disabled=false;b.textContent='End job';toast((err&&err.msg)||'Could not end the job — try again')});
+  }else if(act==='collect'){
+    b.disabled=true; b.textContent='Preparing…';
+    apiCrew('POST','/crew/me/collect',{job_id:+id}).then(function(r){
+      b.disabled=false; b.textContent='Collect payment';
+      if(r.payment_url){
+        toast('Show this page to the customer so they can pay');
+        window.open(r.payment_url,'_blank');
+      }else toast('Payment link is not ready yet');
+    }).catch(function(err){b.disabled=false;b.textContent='Collect payment';toast((err&&err.msg)||'Payment is not ready — your manager sets the amount first')});
+  }
+});
+
+/* clock */
+function payPeriodRange(idx){
+  var anchor=new Date(2026,8,21); anchor.setHours(0,0,0,0);
+  var s=new Date(anchor); s.setDate(s.getDate()+idx*14);
+  var e=new Date(s); e.setDate(e.getDate()+13);
+  return {s:s,e:e};
+}
+function currentPeriodIdx(){
+  var anchor=new Date(2026,8,21); anchor.setHours(0,0,0,0);
+  var now=new Date(); now.setHours(0,0,0,0);
+  return Math.floor((now-anchor)/864e5/14);
+}
+function isoD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function refreshClock(){
+  var badge=$('clockBadge'),title=$('clockTitle'),sub=$('clockSub'),btn=$('clockBtn');
+  badge.textContent='Status'; badge.className='badge';
+  title.textContent='Clock'; sub.textContent='Checking…'; btn.disabled=true;
+  var r=payPeriodRange(currentPeriodIdx());
+  apiCrew('GET','/crew/me/pay?period='+isoD(r.s)).then(function(d){
+    var rows=(d&&d.rows)||[];
+    var t=todayISO();
+    var open=null,lastOut=null;
+    rows.forEach(function(x){
+      var day=String(x.clock_in||'').slice(0,10);
+      if(day!==t)return;
+      if(!x.clock_out)open=x; else lastOut=x;
+    });
+    // today's job options
+    var sel=$('clockJob'); sel.innerHTML='<option value="">No specific job</option>';
+    var todays=(jobsCache||[]).filter(function(j){return String(j.date||'').slice(0,10)===t});
+    todays.forEach(function(j){var o=document.createElement('option');o.value=j.id;o.textContent=(j.client_name||'Job');sel.appendChild(o)});
+    $('clockJobWrap').hidden=!todays.length;
+    var trows=rows.filter(function(x){return String(x.clock_in||'').slice(0,10)===t});
+    $('todayRows').innerHTML=trows.length?trows.map(function(x){
+      return '<div class="drow"><div class="dv">'+esc(fmtTime(x.clock_in))+' – '+(x.clock_out?esc(fmtTime(x.clock_out)):'now')+' · <b>'+Number(x.hours||0).toFixed(2)+'h</b></div></div>';
+    }).join(''):'<p class="meta">Nothing today yet.</p>';
+    btn.disabled=false;
+    if(open){
+      badge.textContent='Clocked in'; badge.className='badge green';
+      title.textContent='You are clocked in';
+      sub.textContent='Since '+fmtTime(open.clock_in);
+      btn.textContent='Clock Out'; btn.dataset.mode='out';
+    }else{
+      badge.textContent='Clocked out'; badge.className='badge';
+      title.textContent='You are clocked out';
+      sub.textContent=lastOut?('Last out '+fmtTime(lastOut.clock_out)):'Tap below when you start work.';
+      btn.textContent='Clock In'; btn.dataset.mode='in';
+    }
+  }).catch(function(e){ if(!e.auth){sub.textContent='Could not check status.';btn.disabled=false;btn.textContent='Clock In';btn.dataset.mode='in'} });
+}
+$('clockBtn').addEventListener('click',function(){
+  var btn=$('clockBtn'),mode=btn.dataset.mode||'in';
+  btn.disabled=true; btn.textContent='Working…';
+  getPos().then(function(pos){
+    var body={action:mode};
+    var jv=$('clockJob').value; if(mode==='in'&&jv)body.job_id=+jv;
+    if(pos){body.lat=pos.lat;body.lng=pos.lng;body.acc=pos.acc}
+    return apiCrew('POST','/crew/me/clock',body);
+  }).then(function(r){
+    if(mode==='in'){toast(r&&r.reused?'Already clocked in':'Clocked in — have a good shift')}
+    else{toast('Clocked out'+(r&&r.hours?' · '+Number(r.hours).toFixed(2)+'h':''))}
+    refreshClock();
+  }).catch(function(){btn.disabled=false;toast('Could not clock '+(mode==='in'?'in':'out')+' — try again')});
+});
+
+/* pay */
+var payIdx=currentPeriodIdx();
+function loadPay(){
+  var r=payPeriodRange(payIdx);
+  $('payLabel').textContent=fmtDate(isoD(r.s))+' – '+fmtDate(isoD(r.e));
+  var box=$('payRows'); box.innerHTML='<div class="spinner">Loading…</div>'; $('payTotals').innerHTML='';
+  apiCrew('GET','/crew/me/pay?period='+isoD(r.s)).then(function(d){
+    var rows=(d&&d.rows)||[];
+    rows.sort(function(a,b){return new Date(a.clock_in)-new Date(b.clock_in)});
+    var rate=Number((d&&d.pay_rate)||0);
+    // Split into Week 1 and Week 2
+    var w1s=new Date(r.s);w1s.setDate(w1s.getDate()+7);
+    var w1=rows.filter(function(x){return new Date(x.clock_in)<w1s});
+    var w2=rows.filter(function(x){return new Date(x.clock_in)>=w1s});
+    function weekHtml(label,weekRows){
+      var wh=weekRows.reduce(function(a,x){return a+Number(x.hours||0)},0);
+      var wp=rate?wh*rate:0;
+      var shifts=weekRows.map(function(x){
+        return '<div class="drow"><div class="dl">'+esc(fmtDay(x.clock_in))+'</div><div class="dv">'+esc(fmtTime(x.clock_in))+' – '+(x.clock_out?esc(fmtTime(x.clock_out)):'<span class="meta">still in</span>')+' · <b>'+Number(x.hours||0).toFixed(2)+'h</b> <button class="btn small" data-editclock="'+x.id+'" style="margin-left:8px">Edit</button></div></div>';
+      }).join('');
+      return '<div class="drow" style="margin-top:8px"><div class="dl"><b>'+label+'</b><br><span class="meta">'+wh.toFixed(2)+'h</span></div><div class="dv"><b>'+(rate?money(wp):'—')+'</b></div></div>'+(shifts||'<div class="empty">No shifts this week.</div>');
+    }
+    var w1e=new Date(r.s);w1e.setDate(w1e.getDate()+6);
+    box.innerHTML=(rows.length?
+      weekHtml('Week 1 ('+fmtDate(isoD(r.s))+' – '+fmtDate(isoD(w1e))+')',w1)+
+      weekHtml('Week 2 ('+fmtDate(isoD(w1s))+' – '+fmtDate(isoD(r.e))+')',w2)
+      :'<div class="empty">No hours this period yet.</div>');
+    var tot=Number((d&&d.total_hours)||0),pay=Number((d&&d.estimated_pay)||tot*rate);
+    $('payTotals').innerHTML='<div class="drow"><div class="dl">Total hours</div><div class="dv"><b>'+tot.toFixed(2)+'h</b></div></div>'+
+      '<div class="drow"><div class="dl">Rate</div><div class="dv">'+(rate?money(rate)+'/hr':'<span class="meta">not set</span>')+'</div></div>'+
+      '<div class="drow"><div class="dl">Estimated pay (period)</div><div class="dv"><b>'+money(pay)+'</b></div></div>';
+  }).catch(function(e){ if(!e.auth)box.innerHTML='<div class="empty">Could not load pay details. Check your connection.</div>'; });
+}
+$('payPrev').addEventListener('click',function(){payIdx--;loadPay()});
+$('payNext').addEventListener('click',function(){payIdx++;loadPay()});
+/* edit clock times (for missed punches) */
+$('payRows').addEventListener('click',function(e){
+  var b=e.target.closest('[data-editclock]');if(!b)return;
+  var id=b.getAttribute('data-editclock');
+  var newIn=prompt('Clock-in time (YYYY-MM-DD HH:MM, 24h):');
+  if(newIn===null)return;
+  var newOut=prompt('Clock-out time (YYYY-MM-DD HH:MM, 24h) — leave blank if still clocked in:');
+  if(newOut===null)return;
+  var payload={};
+  if(newIn.trim())payload.clock_in=newIn.trim().replace(' ','T')+':00';
+  if(newOut.trim())payload.clock_out=newOut.trim().replace(' ','T')+':00';
+  if(!Object.keys(payload).length){toast('No changes');return}
+  apiCrew('PATCH','/crew/me/clock/'+id,payload).then(function(){
+    toast('Clock time updated');loadPay();
+  }).catch(function(){toast('Could not update — try again')});
+});
+
+/* me */
+function loadMe(){
+  apiCrew('GET','/crew/me').then(function(c){
+    $('meName').value=c.name||'';
+    $('mePhone').value=c.phone||'';
+    $('meEmail').value=c.email||'';
+    $('meAddress').value=c.address||'';
+    if(c.name)$('headWho').textContent=c.name;
+    loadCrewChannels(c.id);
+  }).catch(function(){});
+}
+// Crew notification channels — push/email/SMS per event. Isolated from auth flow.
+var CREW_CHANNEL_EVENTS=[
+  ['job_assigned','New jobs'],
+  ['job_changed','Job changes'],
+  ['clock_reminders','Clock reminders']
+];
+function loadCrewChannels(crewId){
+  var box=$('crew-channels');if(!box||!crewId)return;
+  apiCrew('GET','/crew/me/notification-prefs').then(function(prefs){
+    prefs=prefs||{};
+    var html='<p class="meta" style="margin:8px 0 4px">How to receive each alert:</p>'
+      +'<table style="width:100%;font-size:.85rem"><tr style="color:#666;text-align:left"><th></th><th style="text-align:center">Push</th><th style="text-align:center">Email</th><th style="text-align:center">SMS</th></tr>';
+    CREW_CHANNEL_EVENTS.forEach(function(ev){
+      var p=prefs[ev[0]]||{push:true,email:false,sms:false};
+      html+='<tr style="border-top:1px solid #f0f0f0"><td style="padding:6px 2px">'+ev[1]+'</td>'
+        +'<td style="text-align:center"><input type="checkbox" data-crew-ch="push" data-ev="'+ev[0]+'"'+(p.push?' checked':'')+'></td>'
+        +'<td style="text-align:center"><input type="checkbox" data-crew-ch="email" data-ev="'+ev[0]+'"'+(p.email?' checked':'')+'></td>'
+        +'<td style="text-align:center"><input type="checkbox" data-crew-ch="sms" data-ev="'+ev[0]+'"'+(p.sms?' checked':'')+'></td></tr>';
+    });
+    html+='</table><p class="meta" style="font-size:.75rem;margin-top:4px">SMS needs Twilio setup. At least one channel must stay on for job alerts.</p>';
+    box.innerHTML=html;
+    box.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+      cb.addEventListener('change',function(){
+        var ev=cb.dataset.ev,row=cb.closest('tr');
+        var body={event_type:ev,
+          channel_push:row.querySelector('[data-crew-ch=push]').checked,
+          channel_email:row.querySelector('[data-crew-ch=email]').checked,
+          channel_sms:row.querySelector('[data-crew-ch=sms]').checked};
+        apiCrew('PUT','/crew/me/notification-prefs',body).catch(function(){toast('Could not save');loadCrewChannels(crewId)});
+      });
+    });
+  }).catch(function(){/* prefs optional — leave blank */});
+}
+
+$('meSave').addEventListener('click',function(){
+  var b=$('meSave'); b.disabled=true;
+  apiCrew('PATCH','/crew/me',{phone:$('mePhone').value.trim(),email:$('meEmail').value.trim(),address:$('meAddress').value.trim()})
+    .then(function(){b.disabled=false;toast('Saved')})
+    .catch(function(){b.disabled=false;toast('Could not save — try again')});
+});
+
+/* push */
+var PUSH_PREFS=['job_assigned','job_changed','pay_summary','clock_reminder','job_start_reminder'];
+function pushPrefs(){try{return JSON.parse(localStorage.getItem('icando_crew_push_prefs')||'null')||{job_assigned:true,job_changed:true,pay_summary:true,clock_reminder:true,job_start_reminder:true}}catch(e){return{job_assigned:true,job_changed:true,pay_summary:true,clock_reminder:true,job_start_reminder:true}}}
+function savePushPrefs(p){try{localStorage.setItem('icando_crew_push_prefs',JSON.stringify(p))}catch(e){}}
+function pushOn(){try{return localStorage.getItem('icando_crew_push')==='1'}catch(e){return false}}
+function urlB64ToU8(s){var p='='.repeat((4-s.length%4)%4);var b=(s+p).replace(/-/g,'+').replace(/_/g,'/');var r=atob(b);var o=new Uint8Array(r.length);for(var i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o}
+function refreshPushUI(){
+  var on=pushOn(),prefs=pushPrefs();
+  $('pushStatus').textContent=on?'On — you will get alerts on this phone.':'Not set up on this phone yet.';
+  $('pushBtn').textContent=on?'Disable notifications':'Enable notifications';
+  document.querySelectorAll('#pushToggles input').forEach(function(cb){
+    cb.disabled=!on;
+    cb.checked=!!prefs[cb.getAttribute('data-pref')];
+    cb.closest('.check').classList.toggle('dim',!on);
+  });
+}
+$('pushBtn').addEventListener('click',function(){
+  if(pushOn()){
+    /* Local unsubscribe is enough: the next server send gets a 410 from the
+       push service and the stale subscription row is deleted automatically. */
+    var done=function(){
+      try{localStorage.removeItem('icando_crew_push')}catch(e){}
+      refreshPushUI(); toast('Notifications off');
+    };
+    if(!('serviceWorker' in navigator)){done();return}
+    navigator.serviceWorker.ready.then(function(reg){return reg.pushManager.getSubscription()}).then(function(sub){
+      return sub?sub.unsubscribe():null;
+    }).then(done).catch(done);
+    return;
+  }
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){toast('This phone does not support notifications');return}
+  Notification.requestPermission().then(function(perm){
+    if(perm!=='granted'){toast('Allow notifications in your browser settings, then try again');return}
+    return navigator.serviceWorker.ready.then(function(reg){
+      return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToU8(VAPID_PUBLIC)});
+    }).then(function(sub){
+      var j=sub.toJSON();
+      return apiCrew('POST','/crew/me/push-subscriptions',{endpoint:sub.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,prefs:pushPrefs()}).then(function(){
+        try{localStorage.setItem('icando_crew_push','1')}catch(e){}
+        refreshPushUI(); toast('Notifications on');
+      });
+    });
+  }).catch(function(){toast('Could not turn on notifications')});
+});
+document.querySelectorAll('#pushToggles input').forEach(function(cb){
+  cb.addEventListener('change',function(){
+    var prefs=pushPrefs(); prefs[cb.getAttribute('data-pref')]=cb.checked; savePushPrefs(prefs);
+    if(!pushOn())return;
+    if(!('serviceWorker' in navigator))return;
+    navigator.serviceWorker.ready.then(function(reg){return reg.pushManager.getSubscription()}).then(function(sub){
+      if(!sub)return;
+      var j=sub.toJSON();
+      return apiCrew('POST','/crew/me/push-subscriptions',{endpoint:sub.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,prefs:prefs});
+    }).then(function(){toast('Preference saved')}).catch(function(){toast('Could not save — try again')});
+  });
+});
+
+/* install guide */
+function renderInstallGuide(){
+  var isiOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var box=$('installSteps');
+  if(isiOS){
+    box.innerHTML='<ol class="steps"><li>Open this page in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (square with an arrow).</li><li>Tap <b>Add to Home Screen</b>, then <b>Add</b>.</li><li>Open the new <b>Icando Crew</b> icon — you stay logged in.</li></ol><p class="meta">Tip: notifications only arrive when the app is on your Home Screen.</p>';
+  }else{
+    box.innerHTML='<ol class="steps"><li>Open this page in <b>Chrome</b>.</li><li>Tap the <b>⋮ menu</b> (top right).</li><li>Tap <b>Add to Home screen</b> (or <b>Install app</b>).</li><li>Open the new <b>Icando Crew</b> icon — you stay logged in.</li></ol>';
+  }
+}
+
+/* login */
+$('loginUpBtn').addEventListener('click',function(){
+  var u=$('loginUser').value.trim(),p=$('loginPass').value;
+  if(!u||!p){$('loginErr').textContent='Enter your username and password.';return}
+  doAuth({username:u,password:p});
+});
+$('loginLinkBtn').addEventListener('click',function(){var t=tokenFromLink($('loginLink').value);if(!t){$('loginErr').textContent='Paste your login link first.';return}doAuth({token:t})});
+$('logoutBtn').addEventListener('click',function(){if(confirm('Log out of Icando Crew on this phone?'))logout()});
+
+/* manual refresh */
+$('refreshBtn').addEventListener('click',function(){
+  var b=$('refreshBtn');b.style.transform='rotate(180deg)';b.style.transition='transform .4s';
+  setTimeout(function(){b.style.transform='';},450);
+  loadJobs();refreshClock();
+  toast('Schedule refreshed');
+});
+
+/* change password */
+$('pwChangeBtn').addEventListener('click',function(){
+  var cur=$('pwCur').value, nw=$('pwNew').value, nw2=$('pwNew2').value;
+  var msg=$('pwMsg'); msg.style.color=''; msg.textContent='';
+  if(nw!==nw2){msg.style.color='var(--red)';msg.textContent='New passwords do not match.';return}
+  if(nw.length<4){msg.style.color='var(--red)';msg.textContent='New password must be at least 4 characters.';return}
+  $('pwChangeBtn').disabled=true;
+  apiCrew('POST','/crew/me/password',{current_password:cur,new_password:nw}).then(function(){
+    msg.style.color='var(--green)';msg.textContent='Password changed.';
+    $('pwCur').value='';$('pwNew').value='';$('pwNew2').value='';
+    $('pwChangeBtn').disabled=false;
+  }).catch(function(err){
+    msg.style.color='var(--red)';msg.textContent=(err&&err.msg)||'Could not change password.';
+    $('pwChangeBtn').disabled=false;
+  });
+});
+
+/* init */
+(function init(){
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('staff-sw.js').catch(function(){})}
+  renderInstallGuide();
+  var h=''; try{h=window.location.hash||''}catch(e){}
+  var ht=(h.match(/#t=([^&]+)/)||[])[1]||'';
+  if(ht){
+    try{history.replaceState(null,'',window.location.pathname)}catch(e){}
+    doAuth({token:ht});
+    return;
+  }
+  // Deep link: #job-<id> scrolls to that job after jobs load (from push notification tap).
+  var jobHash=(h.match(/#job-(\d+)/)||[])[1]||'';
+  if(jobHash){
+    try{history.replaceState(null,'',window.location.pathname)}catch(e){}
+    window._deepLinkJobId=jobHash;
+  }
+  if(getToken()){enterApp()}
+  else{$('loginView').hidden=false}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#102b4d" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Icando Manager" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23102b4d'/%3E%3Ctext x='32' y='42' font-family='Arial' font-size='30' font-weight='bold' fill='%23ef741d' text-anchor='middle'%3EiM%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Icando Manager</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+    :root{
+      --navy:#102b4d; --navy2:#17416d; --orange:#ef741d; --orange-d:#d96111;
+      --bg:#eef3f7; --card:#ffffff; --ink:#122235; --muted:#5b6d7f; --line:#d9e1e9;
+      --green:#15715b; --green-soft:#e3f4ee; --amber:#9a6200; --amber-soft:#fdf1dc;
+      --tabbar-h: calc(64px + env(safe-area-inset-bottom));
+    }
+    *{box-sizing:border-box}
+    html{min-width:0}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",sans-serif;font-size:15.5px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:var(--tabbar-h)}
+    button,input,textarea,select{font:inherit}
+    .app-head{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;display:flex;align-items:center;justify-content:space-between}
+    .app-head h1{margin:0;font-size:1.25rem;letter-spacing:-.01em}
+    .app-head .sub{display:block;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#ffb078}
+    .icon-btn{background:rgba(255,255,255,.12);border:0;color:#fff;width:40px;height:40px;border-radius:10px;font-size:1.15rem;cursor:pointer}
+    .app-head>div:last-child{display:flex;gap:8px}
+    #updateBar{padding:10px 16px 0}
+    #updateBar .btn{border-color:#fdba74;color:#c2410c;background:#fff7ed}
+    main{max-width:640px;margin:0 auto;padding:16px 14px 30px}
+    .tab{display:none}
+    .tab.active{display:block;animation:fade .18s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 6px 22px rgba(16,43,77,.07)}
+    .card h3{margin:0 0 4px;font-size:1.05rem}
+    .meta{color:var(--muted);font-size:.88rem;margin:2px 0}
+    .row-badges{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+    .badge{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:#e8eef4;color:var(--navy2)}
+    .badge.job{background:#e4ecf7}
+    .badge.cloud{background:#e3f2e8;color:#1d6b3c}
+    .month-nums{display:flex;gap:18px;margin:10px 0 14px}
+    .month-nums b{display:block;font-size:1.35rem}
+    .month-nums span{font-size:.78rem;color:var(--muted)}
+    .status{font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer;border:0}
+    .status.booked,.status.scheduled{background:var(--amber-soft);color:var(--amber)}
+    .status.inprog{background:#dbeafe;color:#1d4ed8;font-weight:700}
+    .status.done{background:var(--green-soft);color:var(--green)}
+    .card-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:700;cursor:pointer;text-decoration:none;color:var(--ink);font-size:.92rem}
+    .btn.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+    .btn.primary:active{background:var(--orange-d)}
+    .btn.small{min-height:38px;padding:7px 12px;font-size:.85rem}
+    .btn.danger{color:#b3372c;border-color:#eec4bf}
+    .btn.block{width:100%}
+    .empty{text-align:center;color:var(--muted);padding:38px 18px}
+    .empty .big{font-size:2rem;display:block;margin-bottom:8px}
+    .field{margin-bottom:14px}
+    .field label{display:block;font-weight:700;font-size:.86rem;margin-bottom:6px}
+    .field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px;background:#fff;color:var(--ink)}
+    .field textarea{min-height:76px;resize:vertical}
+    .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(239,116,29,.22)}
+    .hint{font-size:.78rem;color:var(--muted);margin-top:5px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .btn-row{display:flex;gap:10px;margin-top:10px}
+    .btn-row .btn{flex:1;min-width:0}
+    .check-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .check{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-weight:600;cursor:pointer;background:#fff}
+    .check input{width:18px;height:18px;accent-color:var(--orange)}
+    .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+    .seg button{flex:1;border:0;background:#fff;padding:12px;font-weight:700;cursor:pointer;color:var(--muted)}
+    .seg button.on{background:var(--navy);color:#fff}
+    .result-link{background:#f4f7fa;border:1px dashed var(--line);border-radius:10px;padding:12px;font-size:.82rem;overflow-wrap:anywhere;color:var(--muted);margin:12px 0;max-height:110px;overflow:auto}
+    .quote-out{background:var(--navy);color:#fff;border-radius:14px;padding:18px;margin-top:14px}
+    .quote-out .total{font-size:2.1rem;font-weight:700;margin:4px 0}
+    .quote-out .line{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid rgba(255,255,255,.15);font-size:.92rem}
+    .quote-out .line span:last-child{font-weight:700}
+    .crew-row{display:flex;align-items:center;justify-content:space-between;padding:11px 2px;border-bottom:1px solid var(--line);gap:8px}
+    .crew-row:last-child{border-bottom:0}
+    .crew-row .nm{font-weight:700}
+    @media(max-width:480px){.crew-row{flex-wrap:wrap}.crew-row>div:last-child{flex-basis:100%;justify-content:flex-start;margin-top:6px}}
+    .toast{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + 14px);transform:translate(-50%,16px);opacity:0;background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;transition:.2s;pointer-events:none;z-index:50;max-width:calc(100% - 30px);text-align:center;font-weight:600}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
+    .tabbar button{border:0;background:none;padding:10px 4px 8px;cursor:pointer;color:var(--muted);font-size:.68rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}
+    .tabbar button .t-ic{font-size:1.3rem;line-height:1}
+    .tabbar button.on{color:var(--orange)}
+    .section-title{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 2px 10px}
+    .dash-tools{margin:14px 2px 0}
+    #dashSearch{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:.95rem;background:#fff;color:var(--ink);margin-bottom:8px}
+    .pills{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:.82rem;font-weight:700;color:var(--muted);cursor:pointer}
+    .pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
+    .cthread{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+    .cmt{display:flex;justify-content:space-between;gap:10px;font-size:.85rem;padding:6px 0;border-bottom:1px dotted var(--line)}
+    .cmt em{font-style:normal;color:var(--muted);font-size:.75rem;white-space:nowrap}
+    .cadd{display:flex;gap:8px;margin-top:8px}
+    .cadd input{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.88rem;min-width:0}
+    .qstat{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:#eef4fa;color:var(--navy2)}
+    .cmt em{text-align:right;max-width:62%}
+    .drow{padding:8px 0;border-bottom:1px dotted var(--line)}
+    .drow .dl{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+    .drow .dv{font-size:.88rem;line-height:1.5;overflow-wrap:anywhere}
+    .section-title:first-child{margin-top:2px}
+    .field{position:relative}
+    .addr-drop{position:absolute;left:0;right:0;top:100%;z-index:40;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 34px rgba(16,43,77,.16);overflow:hidden;margin-top:4px}
+    .addr-drop button{display:block;width:100%;text-align:left;border:0;background:none;padding:11px 13px;cursor:pointer;font-size:.9rem;border-bottom:1px solid #eef2f6;color:var(--ink)}
+    .addr-drop button:last-child{border-bottom:0}
+    .addr-drop button:active{background:#f2f6fa}
+    .addr-drop .src{display:block;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .addr-attrib{font-size:.68rem;color:var(--muted);padding:6px 13px;background:#f7fafc}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+  <header class="app-head">
+    <div><span class="sub">Icando Movers</span><h1>Manager</h1></div>
+    <div>
+      <button class="icon-btn" id="reloadBtn" aria-label="Reload app" title="Reload app">⟳</button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+    </div>
+  </header>
+  <div id="updateBar" hidden><button class="btn small block" id="updateBtn">⟳ New version available — tap to update</button></div>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section class="tab active" id="tab-dash">
+      <div id="monthSummary"></div>
+      <div class="dash-tools">
+        <input id="dashSearch" type="search" placeholder="Search name, address, date…" autocomplete="off" aria-label="Search bookings and jobs">
+        <div class="pills" id="statusPills">
+          <button class="pill on" data-f="all">All</button>
+          <button class="pill" data-f="active">Active</button>
+          <button class="pill" data-f="completed">Completed</button>
+          <button class="pill" data-f="cancelled">Cancelled</button>
+        </div>
+      </div>
+      <div class="section-title">Bookings</div>
+      <div id="bookingList"></div>
+      <div class="section-title">Jobs</div>
+      <div id="jobList"></div>
+      <div class="section-title" id="quoteSectionTitle" style="display:none">Matching quotes</div>
+      <div id="quoteSearchList"></div>
+    </section>
+
+    <!-- LEADS (HubSpot quote form) -->
+    <section class="tab" id="tab-leads">
+      <div class="card">
+        <h3>Website quote leads</h3>
+        <p class="meta">Pulled live from HubSpot — website quotes + Meta/Facebook leads. Tap "Use for booking" to prefill the booking form.</p>
+        <button class="btn primary block" id="leads-refresh">Refresh leads</button>
+        <p class="hint" id="leads-status"></p>
+      </div>
+      <div id="leadsList"></div>
+    </section>
+
+    <!-- NEW BOOKING -->
+    <section class="tab" id="tab-booking">
+      <div class="card">
+        <h3>New client booking</h3>
+        <p class="meta">Generates the client booking page link.</p>
+        <div class="field"><label>Client name(s)</label><input id="b-client" autocomplete="name" placeholder="e.g. Jeena Chartier"></div>
+        <div class="field"><label>Client email</label><input id="b-email" type="email" inputmode="email" placeholder="For the confirmation email"></div>
+        <div class="field"><label>Client phone</label><input id="b-phone" type="tel" inputmode="tel" placeholder="For the SMS confirmation"></div>
+        <div class="grid2">
+          <div class="field"><label>Move date</label><input id="b-date" type="date"></div>
+          <div class="field"><label>Start time</label><input id="b-time" type="time" value="09:30"></div>
+        </div>
+        <div class="field"><label>Pickup address</label><textarea id="b-pickup" placeholder="Street, city, province, postal code"></textarea></div>
+        <div class="field"><label>Drop-off address</label><textarea id="b-dropoff" placeholder="Street, city, province, postal code"></textarea></div>
+        <div class="grid2">
+          <div class="field"><label>Movers</label><input id="b-movers" type="number" min="1" max="12" value="2"></div>
+          <div class="field"><label>Minimum price ($)</label><input id="b-minimum" type="number" min="0" step="1" value="480"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Hourly rate ($)</label><input id="b-hourly" type="number" min="0" step="1" value="120"></div>
+          <div class="field"><label>Travel fee ($)</label><input id="b-travel" type="number" min="0" step="1" value="120"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Calendar hours</label><input id="b-duration" type="number" min="1" max="24" step="0.5" value="3"></div>
+          <div class="field"><label>Reference</label><input id="b-reference" placeholder="QT-2026-0000"></div>
+        </div>
+        <div class="field"><label>Booking notes</label><textarea id="b-notes" placeholder="Payment terms, instructions…"></textarea></div>
+        <div class="field"><label>Square payment link <span class="hint" style="display:inline">— optional, goes in the thank-you email after the job</span></label><input id="b-paylink" inputmode="url" placeholder="https://square.link/u/…"></div>
+        <button class="btn primary block" id="b-generate">Generate booking link</button>
+        <div id="b-result" hidden>
+          <div class="result-link" id="b-link"></div>
+          <div class="card-actions">
+            <button class="btn small primary" id="b-copy">Copy link</button>
+            <button class="btn small" id="b-open">Open page</button>
+            <button class="btn small" id="b-mail">Email draft</button>
+            <button class="btn small" id="b-sms">SMS draft</button>
+            <button class="btn small" id="b-dispatch">🔔 Confirm + remind</button>
+          </div>
+          <p class="hint">Email draft + SMS draft open prefilled messages to the client — just hit send in each. 🔔 Confirm + remind still schedules the day-before reminder automatically.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW JOB -->
+    <section class="tab" id="tab-job">
+      <div class="card">
+        <h3>New job schedule</h3>
+        <p class="meta">Generates the staff schedule link.</p>
+        <div class="field"><label>Client name(s)</label><input id="j-client" list="clientList" placeholder="e.g. Jeena Chartier"><datalist id="clientList"></datalist></div>
+        <div class="grid2">
+          <div class="field"><label>Job date</label><input id="j-date" type="date"></div>
+          <div class="field"><label>Quote reference</label><input id="j-quote" placeholder="QT-2026-0000"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Yard meet time</label><input id="j-yardTime" type="time" value="09:00"></div>
+          <div class="field"><label>Pickup time</label><input id="j-pickupTime" type="time" value="09:30"></div>
+        </div>
+        <div class="field"><label>Yard address</label><input id="j-yardAddress"></div>
+        <div class="field"><label>Pickup address</label><textarea id="j-pickup"></textarea></div>
+        <div class="field"><label>Drop-off address</label><textarea id="j-dropoff"></textarea></div>
+        <div class="grid2">
+          <div class="field"><label>Movers</label><input id="j-movers" type="number" min="1" max="12" value="2"></div>
+          <div class="field"><label>Minimum ($)</label><input id="j-minimum" type="number" min="0" step="1" value="480"></div>
+        </div>
+        <div class="field"><label>Assigned crew</label><div class="check-list" id="j-crew"></div>
+          <p class="hint">Manage names in the Crew tab.</p></div>
+        <div class="grid2">
+          <div class="field"><label>Client phone</label><input id="j-clientPhone" type="tel" placeholder="+1 …"></div>
+          <div class="field"><label>Client email</label><input id="j-clientEmail" type="email" placeholder="client@email.com"></div>
+        </div>
+        <div class="field"><label>Job notes for crew</label><textarea id="j-notes" placeholder="e.g. Use the big truck"></textarea></div>
+        <button class="btn primary block" id="j-generate">Create job & notify crew</button>
+        <div id="j-result" hidden>
+          <div class="result-link" id="j-link"></div>
+          <div class="card-actions">
+            <button class="btn small primary" id="j-copy">Copy link</button>
+            <button class="btn small" id="j-open">Open page</button>
+            <button class="btn small" id="j-dispatch">🔔 Remind crew</button>
+          </div>
+          <p class="hint">Saved to your dashboard. Share the link with the crew, then tap 🔔 Remind crew and Muse will send the day-before crew reminder automatically.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUOTE -->
+    <section class="tab" id="tab-quote">
+      <div class="card">
+        <h3>Quote calculator</h3>
+        <div class="field"><label>Client name <span class="hint" style="display:inline">— optional, personalizes the quote</span></label><input id="q-client" placeholder="e.g. Jeena Chartier"></div>
+        <div class="field"><label>Move location</label>
+          <div class="seg" id="q-area">
+            <button type="button" data-v="within" class="on">Within Winnipeg</button>
+            <button type="button" data-v="outside">Outside Winnipeg</button>
+          </div>
+        </div>
+        <div class="field" id="q-cityWrap" hidden><label>City / town</label>
+          <select id="q-city" style="width:100%;padding:12px;border:1px solid #dfe5ee;border-radius:10px;font-size:16px"></select>
+          <p class="hint">Sets the truck fee from your per-city list. You can still adjust it below.</p>
+        </div>
+        <div class="field"><label>Crew size</label>
+          <div class="seg" id="q-movers">
+            <button type="button" data-v="2" class="on">2 movers</button>
+            <button type="button" data-v="3">3 movers</button>
+          </div>
+        </div>
+        <div class="section-title">Adjust quote</div>
+        <div class="grid3">
+          <div class="field"><label>Rate $/hr</label><input id="q-hourly" type="number" min="0" step="1" value="120"></div>
+          <div class="field"><label>Min. hours</label><input id="q-hours" type="number" min="1" step="0.5" value="3"></div>
+          <div class="field"><label>Travel $</label><input id="q-travel" type="number" min="0" step="1" value="120"></div>
+        </div>
+        <div class="field"><label>Notes <span class="hint" style="display:inline">— optional, shown on the quote</span></label><input id="q-notes" placeholder="e.g. Includes piano · 3rd floor walk-up"></div>
+        <div class="section-title">Move details <span class="hint" style="display:inline;text-transform:none;letter-spacing:0">— optional, shown on the PDF</span></div>
+        <div class="field"><label>Move date</label><input id="q-movedate" type="date"></div>
+        <div class="field"><label>Pickup address</label><input id="q-pickup" placeholder="Start typing an address…"></div>
+        <div class="field"><label>Drop-off address</label><input id="q-dropoff" placeholder="Start typing an address…"></div>
+        <div class="quote-out" id="q-out"></div>
+        <div class="card-actions" style="margin-top:14px">
+          <button class="btn primary block" id="q-use">Use for booking</button>
+        </div>
+        <div class="card-actions" style="margin-top:10px">
+          <button class="btn block" id="q-pdf">Download PDF quote</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="q-save">💾 Save</button>
+          <button class="btn" id="q-copy">Copy quote</button>
+          <button class="btn" id="q-email">Email quote</button>
+          <button class="btn" id="q-wa">WhatsApp</button>
+        </div>
+        <p class="hint">Payment: e-transfer +5% GST · credit card +3% fee and 5% GST · cash no GST. Due after completion. Quote valid 14 days.</p>
+      </div>
+      <div class="section-title">Sent quotes</div>
+      <div id="quoteList"></div>
+    </section>
+
+    <!-- CREW -->
+    <section class="tab" id="tab-crew">
+      <div class="card">
+        <h3>Who's clocked in</h3>
+        <p class="meta">Live status for the 5 active crew — green means on the clock.</p>
+        <div id="crewStatus"><p class="meta" style="text-align:center">Loading…</p></div>
+      </div>
+      <div class="card">
+        <h3>Crew roster</h3>
+        <p class="meta">Tap names to assign them when creating a job.</p>
+        <div id="crewList"></div>
+        <div class="field" style="margin-top:14px"><label>Add mover</label>
+          <input id="crewName" placeholder="Full name" style="margin-bottom:8px">
+          <div class="grid2">
+            <input id="crewPhone" type="tel" placeholder="Phone (optional)">
+            <input id="crewEmail" type="email" placeholder="Email (optional)">
+          </div>
+          <button class="btn primary block" id="crewAdd" style="margin-top:8px">Add mover</button>
+          <p class="hint">Phone/email are used for automatic crew reminders.</p>
+        </div>
+        <button class="btn block" id="crewShare" style="margin-top:10px">✉️ Share roster with Muse</button>
+        <p class="hint">Sends your current crew list to Muse so schedules and reminders always use up-to-date names and contacts.</p>
+      </div>
+    </section>
+
+    <!-- PROFIT -->
+    <section class="tab" id="tab-profit">
+      <div class="card">
+        <div class="row-badges"><span class="badge">Profitability</span></div>
+        <h3>Job profitability</h3>
+        <p class="meta">Revenue vs labor cost for completed jobs. Set crew hourly rates once, adjust hours per job as needed.</p>
+        <div class="field"><label>Month</label><input type="month" id="profit-month"></div>
+        <div id="profit-summary" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h3>Crew hourly rates</h3>
+        <p class="meta">Used to compute labor cost. Saved to the database.</p>
+        <div id="profit-rates"></div>
+      </div>
+      <div id="profit-jobs"></div>
+      <p class="hint" id="profit-status" style="text-align:center"></p>
+    </section>
+
+    <!-- PAYROLL -->
+    <section class="tab" id="tab-payroll">
+      <div class="card">
+        <div class="row-badges"><span class="badge">Payroll</span></div>
+        <h3>Crew payroll</h3>
+        <p class="meta">Clock-ins from Connecteam + the scheduling page × crew hourly rates. Pay period view for payroll runs; Month view for monthly records and expenses.</p>
+        <div class="field"><label>View</label>
+          <div style="display:flex;gap:8px">
+            <button class="btn small primary" id="pay-view-period" style="flex:1">Pay period</button>
+            <button class="btn small" id="pay-view-month" style="flex:1">Month</button>
+          </div>
+        </div>
+        <div class="field"><label>Pay period (bi-weekly)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn small" id="pay-prev">‹ Prev</button>
+            <div id="pay-week-label" style="flex:1;text-align:center;font-weight:700"></div>
+            <button class="btn small" id="pay-next">Next ›</button>
+          </div>
+        </div>
+        <div id="pay-summary" style="margin-top:10px"></div>
+      </div>
+      <div id="pay-crews"></div>
+      <p class="hint" id="pay-status" style="text-align:center"></p>
+      <p class="hint" style="text-align:center">Hourly rates are set in the Profit tab. Fix a wrong entry by deleting it here — the crew member can clock in again.</p>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section class="tab" id="tab-notifs">
+      <div class="card">
+        <div class="row-badges"><span class="badge">🔔 Notifications</span></div>
+        <h3>Notification inbox</h3>
+        <p class="meta">Every crew update, acceptance, reschedule/release request, clock-in and job event lands here. Nothing is deleted automatically — trash what you've handled.</p>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn small" id="notif-refresh" style="flex:1">⟳ Refresh</button>
+          <button class="btn small" id="notif-clear" style="flex:1">🗑 Clear all</button>
+        </div>
+        <div id="notif-list"></div>
+        <p class="hint" id="notif-status" style="text-align:center"></p>
+      </div>
+      <div class="card">
+        <div class="row-badges"><span class="badge">✓ Acceptances</span></div>
+        <h3>Crew job acceptances</h3>
+        <p class="meta">Who has accepted, rejected, or not yet responded to each job.</p>
+        <button class="btn small primary" id="resp-refresh" style="width:100%;margin-bottom:10px">⟳ Check acceptances</button>
+        <div id="resp-list"></div>
+      </div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section class="tab" id="tab-sched">
+      <div class="card">
+        <div class="row-badges"><span class="badge">📅 Schedule</span></div>
+        <h3>Schedule</h3>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <button class="btn small" id="sched-week-prev">‹‹ Week</button>
+          <input type="date" id="sched-date" style="flex:1;text-align:center;font-weight:700">
+          <button class="btn small" id="sched-week-next">Week ››</button>
+        </div>
+        <div id="sched-weekstrip" style="display:flex;gap:4px;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+          <button class="btn small" id="sched-prev">‹ Prev day</button>
+          <button class="btn small" id="sched-next">Next day ›</button>
+          <button class="btn small" id="sched-today" style="margin-left:auto">Today</button>
+        </div>
+        <div id="sched-status"></div>
+        <div id="sched-list"></div>
+        <div id="sched-detail" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="tab" id="tab-settings">
+      <div class="card">
+        <h3>Settings</h3>
+        <div class="field"><label>Booking page URL</label><input id="s-bookingBase"></div>
+        <div class="field"><label>Staff scheduling page URL</label><input id="s-schedulingBase"></div>
+        <div class="field"><label>Default yard address</label><input id="s-yard"></div>
+        <div class="grid2">
+          <div class="field"><label>Company phone</label><input id="s-phone"></div>
+          <div class="field"><label>Company email</label><input id="s-email"></div>
+        </div>
+        <div class="field"><label>Google Places API key</label><input id="s-placesKey" placeholder="Optional — address suggestions already work without it"><p class="hint">Only needed as a premium upgrade; the app suggests addresses on its own.</p></div>
+        <button class="btn primary block" id="s-save">Save settings</button>
+      </div>
+      <div class="card">
+        <h3>Notifications</h3>
+        <p class="meta" id="push-status">Checking…</p>
+        <div class="field"><div id="push-toggles" class="check-list"></div></div>
+        <button class="btn primary block" id="push-toggle">Enable notifications</button>
+        <p class="hint">Clock-ins, new leads, completed jobs and quiet quotes — toggle each type on or off anytime.</p>
+      </div>
+      <div class="card">
+        <h3>Notification channels</h3>
+        <p class="meta">Choose how you want to receive each type — app push, email, SMS, or any combination.</p>
+        <div id="channel-prefs"><p class="meta" style="text-align:center">Loading…</p></div>
+        <p class="hint">SMS requires Twilio setup. Email sends from your Gmail.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Manager sections">
+    <button data-tab="tab-dash" class="on"><span class="t-ic">▦</span>Home</button>
+    <button data-tab="tab-leads"><span class="t-ic">✉</span>Leads</button>
+    <button data-tab="tab-booking"><span class="t-ic">＋</span>Booking</button>
+    <button data-tab="tab-job"><span class="t-ic">◷</span>Job</button>
+    <button data-tab="tab-quote"><span class="t-ic">＄</span>Quote</button>
+    <button data-tab="tab-crew"><span class="t-ic">⛟</span>Crew</button>
+    <button data-tab="tab-profit"><span class="t-ic">📊</span>Profit</button>
+    <button data-tab="tab-payroll"><span class="t-ic">🧾</span>Payroll</button>
+    <button data-tab="tab-notifs"><span class="t-ic">🔔</span>Alerts</button>
+    <button data-tab="tab-sched"><span class="t-ic">📅</span>Schedule</button>
+  </nav>
+  <div class="toast" id="toast" role="status"></div>
+<script>
+(function(){
+'use strict';
+var LS_KEY='icando-manager-v1';
+// === SERVER-FIRST SYNC ===
+// API is the single source of truth for jobs, clients, crew, quotes.
+// localStorage keeps ONLY: settings, push prefs, dismissed leads, UI state, drafts.
+// DB is an in-memory cache, populated from API, never persisted.
+var DB={jobs:[],clients:[],crew:[],lastSync:0};
+// Convert API job shape to the view shape used by dashboard/schedule/alerts.
+function toViewJob(j){
+  if(!j) return null;
+  return {
+    id:'api-'+j.id, api_id:j.id,
+    client:j.client_name||'Unnamed', date:(j.date||'').slice(0,10),
+    start_time:j.start_time||'', end_time:j.end_time||'',
+    pickupTime:j.start_time||'', // legacy alias
+    pickup:j.pickup||'', dropoff:j.dropoff||'',
+    yard_meet:j.yard_meet||'', yardTime:j.yard_meet||'',
+    status:j.status||'booked', price:j.price||0,
+    crew:Array.isArray(j.crew)?j.crew:[],
+    client_phone:j.client_phone||'', client_email:j.client_email||'',
+    access_notes:j.access_notes||'', special_instructions:j.special_instructions||'',
+    notes:j.special_instructions||'',
+    started_at:j.started_at||'', ended_at:j.ended_at||'',
+    started_by:j.started_by||'', ended_by:j.ended_by||'',
+    billable_hours:j.billable_hours||0,
+    reference:j.quote_no||'',
+    type:'job', source:'api'
+  };
+}
+DB.refresh=function(){
+  return apiCall('GET','/jobs',null,true).then(function(jobs){
+    DB.jobs=(jobs||[]).map(toViewJob).filter(Boolean);
+    DB.lastSync=Date.now();
+    return DB.jobs;
+  });
+};
+DB.get=function(apiId){
+  for(var i=0;i<DB.jobs.length;i++){
+    if(String(DB.jobs[i].api_id)===String(apiId)) return DB.jobs[i];
+  }
+  return null;
+};
+DB.getById=function(localId){
+  for(var i=0;i<DB.jobs.length;i++){
+    if(DB.jobs[i].id===localId) return DB.jobs[i];
+  }
+  return null;
+};
+// Refresh if stale (>60s) or empty.
+DB.ensure=function(){
+  if(!DB.jobs.length || (Date.now()-DB.lastSync)>60000){
+    return DB.refresh().catch(function(){ return DB.jobs; });
+  }
+  return Promise.resolve(DB.jobs);
+};
+var LOGO_IMG="data:image/jpeg;base64,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";
+var DEFAULTS={
+  // NOTE: jobs, bookings, crew now come from the API (DB cache).
+  // localStorage keeps only: settings, dismissedLeads, quotes (drafts),
+  // addressHistory, comments.
+  addressHistory:[], comments:{}, quotes:[],
+  dismissedLeads:[],
+  settings:{
+    bookingBase:'https://icando-booking.netlify.app/',
+    schedulingBase:'https://icando-booking.netlify.app/scheduling.html',
+    yardAddress:'463 Dawson Road North, Winnipeg, Manitoba',
+    phone:'204-229-5871', email:'info@icandomovers.ca', placesKey:''
+  }
+};
+function load(){
+  try{
+    var s=JSON.parse(localStorage.getItem(LS_KEY));
+    if(s&&typeof s==='object'){
+      var st=Object.assign({},DEFAULTS,s,{
+        settings:Object.assign({},DEFAULTS.settings,s.settings||{})
+      });
+      // Migrate: drop any stale jobs/bookings/crew from old localStorage.
+      delete st.jobs; delete st.bookings; delete st.crew;
+      // Crew is synced from API; init empty until syncCrewFromDb runs.
+      st.crew=[];
+      return st;
+    }
+  }catch(e){}
+  var fresh=JSON.parse(JSON.stringify(DEFAULTS));
+  fresh.crew=[];
+  return fresh;
+}
+function save(){
+  try{
+    // Persist ONLY local data: settings, push prefs, dismissed leads, UI state, drafts.
+    // Jobs, bookings, crew come from the API (DB cache) — never persist stale server data.
+    var toSave={
+      settings:state.settings,
+      dismissedLeads:state.dismissedLeads,
+      quotes:state.quotes,
+      addressHistory:state.addressHistory,
+      comments:state.comments
+    };
+    localStorage.setItem(LS_KEY,JSON.stringify(toSave));
+  }catch(e){}
+}
+var state=load();
+function $(id){return document.getElementById(id)}
+var toastTimer;
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},2200)}
+function money(v){var n=Number(v);if(!isFinite(n))return '';return new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD',minimumFractionDigits:Number.isInteger(n)?0:2}).format(n)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function fmtDate(iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');if(!m)return iso||'';var d=new Date(+m[1],+m[2]-1,+m[3]);return new Intl.DateTimeFormat('en-CA',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).format(d)}
+function fmtTime12(hhmm){var m=/^(\d{1,2}):(\d{2})/.exec(hhmm||'');if(!m)return hhmm||'';var h=+m[1],suf=h>=12?'PM':'AM',t=h%12||12;return t+':'+m[2]+' '+suf}
+function copyText(t,msg){function done(){toast(msg||'Copied')}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(function(){fallback()})}else fallback();function fallback(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){toast('Copy failed — long-press the link')}document.body.removeChild(ta)}}
+function buildQuery(obj){var q=new URLSearchParams();Object.keys(obj).forEach(function(k){var v=obj[k];if(v!==''&&v!=null)q.set(k,String(v))});return q.toString()}
+function bookingLink(f){var base=state.settings.bookingBase.replace(/\/*$/,'/');return base+'?'+buildQuery({client:f.client,date:f.date,time:f.time,pickup:f.pickup,dropoff:f.dropoff,movers:f.movers,minimum:f.minimum,hourly:f.hourly,duration:f.duration,notes:f.notes,reference:f.reference,travel:f.travel})}
+function jobLink(f,jobId){var base=state.settings.schedulingBase;var q={client:f.client,date:f.date,yardTime:fmtTime12(f.yardTime),yardAddress:f.yardAddress,pickupTime:fmtTime12(f.pickupTime),pickupAddress:f.pickup,dropoff:f.dropoff,quote:f.quote,movers:f.movers,minimum:f.minimum,crew:f.crew.join(','),clientPhone:f.clientPhone,clientEmail:f.clientEmail,notes:f.notes};if(jobId)q.job_id=jobId;return base+'?'+buildQuery(q)}
+
+/* tabs */
+var tabBtns=document.querySelectorAll('.tabbar button');
+function showTab(id){document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.id===id)});tabBtns.forEach(function(b){b.classList.toggle('on',b.dataset.tab===id)});window.scrollTo(0,0)}
+tabBtns.forEach(function(b){b.addEventListener('click',function(){showTab(b.dataset.tab)})});
+$('settingsBtn').addEventListener('click',function(){fillSettings();refreshPushUI();loadChannelPrefs();showTab('tab-settings')});
+
+/* leads (HubSpot quote form) */
+state.dismissedLeads = state.dismissedLeads || [];
+var leadsCache = [];
+function fmtSubmitted(ts){if(!ts)return '';var d=new Date(Number(ts));return new Intl.DateTimeFormat('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(d)}
+function getManagerKey(){
+  var k = '';
+  try { k = sessionStorage.getItem('icando_mgr_key') || ''; } catch(e){}
+  if(!k){
+    k = prompt('Enter your manager key to load website leads:') || '';
+    k = k.trim();
+    try { if(k) sessionStorage.setItem('icando_mgr_key', k); } catch(e){}
+  }
+  return k;
+}
+/* API: secured calls to the operations database */
+function getManagerKeySilent(){try{return sessionStorage.getItem('icando_mgr_key')||''}catch(e){return ''}}
+function apiCall(method,path,body,silent){
+  var key=silent?getManagerKeySilent():getManagerKey();
+  if(!key)return Promise.reject({auth:true});
+  return fetch('/.netlify/functions/api'+path,{method:method,headers:{'Content-Type':'application/json','x-manager-key':key},body:body?JSON.stringify(body):undefined}).then(function(r){
+    if(r.status===401){try{sessionStorage.removeItem('icando_mgr_key')}catch(e){}throw{auth:true}}
+    if(!r.ok)throw{http:r.status};
+    return r.json();
+  });
+}
+function fetchLeads(){
+  var st=$('leads-status'); st.textContent='Loading…'; $('leadsList').innerHTML='';
+  var key = getManagerKey();
+  if(!key){ st.textContent='A manager key is required to view leads.'; return; }
+  fetch('/.netlify/functions/hubspot-leads', {headers:{'x-manager-key': key}}).then(function(r){
+    if(r.status===401){ try{sessionStorage.removeItem('icando_mgr_key');}catch(e){} throw {auth:true}; }
+    return r.json();
+  }).then(function(data){
+    if(data.error){
+      st.textContent = data.error==='not_configured'
+        ? 'Not connected yet — add your HubSpot key as HUBSPOT_TOKEN in Netlify site settings, then redeploy.'
+        : 'Could not load leads: '+(data.message||data.error);
+      return;
+    }
+    leadsCache = data.leads || [];
+    var fresh = leadsCache.filter(function(l){return state.dismissedLeads.indexOf(l.id)<0});
+    st.textContent = fresh.length ? fresh.length+' new lead'+(fresh.length===1?'':'s') : 'No new leads.';
+    renderLeads(fresh);
+  }).catch(function(err){ st.textContent = (err && err.auth) ? 'Wrong manager key — try again.' : 'Could not reach the leads service. Check your connection and try again.' });
+}
+function renderLeads(list){
+  $('leadsList').innerHTML = list.length ? list.map(function(l){
+    var when = (l.moveDate?esc(l.moveDate):'no date') + (l.submittedAt?' · requested '+fmtSubmitted(l.submittedAt):'');
+    var sizeLabels={studio:'Studio','1_bedroom':'1 bedroom','2_bedroom':'2 bedrooms','3_bedroom':'3 bedrooms','4_plus_bedrooms':'4+ bedrooms',office:'Office / commercial'};
+    var size = l.moveSize ? (sizeLabels[l.moveSize]||l.moveSize) : '';
+    var badge = l.source==='facebook' ? '<span class="badge">Meta lead</span>' : '<span class="badge">Quote lead</span>';
+    var route = (l.pickup||l.dropoff) ? '<p class="meta">'+esc(l.pickup||'?')+' → '+esc(l.dropoff||'?')+'</p>' : '';
+    return '<div class="card"><div class="row-badges">'+badge+'</div>'+
+      '<h3>'+esc(l.firstname||'Unnamed')+'</h3>'+
+      '<p class="meta">'+esc(when)+(size?' · 🏠 '+esc(size):'')+'</p>'+
+      route+
+      '<p class="meta">'+(l.phone?esc(l.phone):'')+(l.phone&&l.email?' · ':'')+(l.email?esc(l.email):'')+'</p>'+
+      '<div class="card-actions"><button class="btn small primary" data-lead="'+esc(l.id)+'" data-act="use">Use for booking →</button>'+
+      '<button class="btn small" data-lead="'+esc(l.id)+'" data-act="dismiss">Dismiss</button></div></div>';
+  }).join('') : '<div class="card empty"><span class="big">✉</span>All caught up — new website quotes will appear here.</div>';
+}
+$('leads-refresh').addEventListener('click', fetchLeads);
+document.addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('[data-lead]') : null;
+  if(!b) return;
+  var lead = null;
+  for(var i=0;i<leadsCache.length;i++){ if(leadsCache[i].id===b.getAttribute('data-lead')){ lead=leadsCache[i]; break; } }
+  if(!lead) return;
+  if(b.getAttribute('data-act')==='dismiss'){
+    state.dismissedLeads.push(lead.id); save();
+    renderLeads(leadsCache.filter(function(l){return state.dismissedLeads.indexOf(l.id)<0}));
+    toast('Lead dismissed');
+  } else {
+    $('b-client').value = lead.firstname || '';
+    $('b-email').value = lead.email || '';
+    $('b-phone').value = lead.phone || '';
+    if(/^\d{4}-\d{2}-\d{2}$/.test(lead.moveDate||'')) $('b-date').value = lead.moveDate;
+    $('b-pickup').value = lead.pickup || '';
+    $('b-dropoff').value = lead.dropoff || '';
+    showTab('tab-booking');
+    toast('Booking form prefilled from lead');
+  }
+});
+
+/* dashboard */
+function statusChip(item,type){var s=item.status;var label,inprog=false;
+  if(type==='job'&&item.started_at&&!item.ended_at){label='In Progress';inprog=true}
+  else if(statusGroup(item)==='completed'&&s!=='done'&&s!=='completed'){label='Completed'}
+  else label=(s==='done'||s==='completed')?(s==='completed'?'Completed':'Done'):type==='booking'?'Booked':'Scheduled';
+  return '<button class="status '+(inprog?'inprog':(label==='Completed'?'completed':s))+'" data-type="'+type+'" data-id="'+item.id+'">'+label+'</button>'}
+/* dashboard search, status filters, and per-record notes */
+var dashQ='', dashF='all', openComments=null, openDetail=null;
+function statusGroup(item){
+  var s=item.status;
+  if(s==='cancelled')return 'cancelled';
+  if(s==='done'||s==='completed')return 'completed';
+  // Auto-treat past-due items as completed (date passed and not explicitly kept active).
+  try{
+    var d=(item.date||'').slice(0,10);
+    if(d&&d<todayISO()&&!item.keepActive)return 'completed';
+  }catch(e){}
+  return 'active';
+}
+function todayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function matchQ(item){
+  if(!dashQ)return true;
+  var crewStr=(item.crew||[]).map(function(c){return typeof c==='string'?c:(c.name||'')}).join(' ');
+  var hay=((item.client||'')+' '+(item.pickup||'')+' '+(item.dropoff||'')+' '+(item.reference||'')+' '+(item.client_phone||'')+' '+crewStr+' '+(item.date||'')+' '+(item.date?fmtDate(item.date):'')).toLowerCase();
+  return dashQ.toLowerCase().split(/\s+/).every(function(w){return w&&hay.indexOf(w)>-1});
+}
+function commentThread(item,type){
+  var cs=((state.comments||{})[item.id])||[];
+  return '<div class="cthread">'+cs.map(function(c){
+    return '<div class="cmt"><span>'+esc(c.text)+'</span><em>'+esc((c.t||'').slice(0,10))+'</em></div>';
+  }).join('')+
+  '<div class="cadd"><input id="cinput" placeholder="Add a note…" aria-label="Add a note"><button class="btn small" data-act="commentadd" data-type="'+type+'" data-id="'+item.id+'">Add</button></div></div>';
+}
+function emptyDashMsg(type){
+  if(dashQ||dashF!=='all')return '<div class="card empty">No matches — try a different search or filter.</div>';
+  return type==='booking'
+    ? '<div class="card empty"><span class="big">📋</span>No bookings yet — create one in the Booking tab.</div>'
+    : '<div class="card empty"><span class="big">🗓</span>No jobs scheduled yet — create one in the Job tab.</div>';
+}
+function renderDash(){
+  function card(item,type){
+    var timeStr=item.time||item.pickupTime||item.start_time||'';
+    var timeFmt=(function(iso){
+      if(!iso) return '';
+      // ISO format: parse as date.
+      if(/T/.test(iso)){
+        try{
+          var d=new Date(iso);
+          var h=d.getHours(), m=d.getMinutes();
+          var ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12;
+          return h+':'+String(m).padStart(2,'0')+' '+ap;
+        }catch(e){ return ''; }
+      }
+      return fmtTime12(iso);
+    })(timeStr);
+    var when=fmtDate(item.date)+(timeFmt?' · '+timeFmt:'');
+    // Show yard meet time if set.
+    var yardStr='';
+    if(item.yard_meet||item.yardTime){
+      var yt=item.yard_meet||item.yardTime;
+      var yFmt=(function(iso){
+        if(!iso)return '';
+        if(/T/.test(iso)){
+          try{
+            var d=new Date(iso);
+            var h=d.getHours(),m=d.getMinutes();
+            var ap=h>=12?'PM':'AM';h=h%12;if(h===0)h=12;
+            return h+':'+String(m).padStart(2,'0')+' '+ap;
+          }catch(e){return ''}
+        }
+        return fmtTime12(iso);
+      })(yt);
+      if(yFmt)yardStr='<p class="meta">🏠 Yard meet: '+esc(yFmt)+'</p>';
+    }
+    var route=type==='booking'?esc(item.pickup||'')+' → '+esc(item.dropoff||''):esc(item.pickup||'')+' → '+esc(item.dropoff||'');
+    var crewNames=(item.crew||[]).map(function(c){return typeof c==='string'?c:(c.name||'')}).filter(Boolean);
+    var did='" data-type="'+type+'" data-id="'+item.id+'">';
+    var actions='';
+    if(item.link){
+      actions='<button class="btn small primary" data-act="copy'+did+'Copy link</button>'+
+        '<button class="btn small" data-act="view'+did+'View</button>';
+    }else{
+      actions='<button class="btn small" data-act="detail'+did+'>👁 Details</button>';
+    }
+    if(type==='booking'&&item.status==='completed'){
+      actions+='<button class="btn small" data-act="review'+did+'✉️ Review</button>'+
+        '<button class="btn small" data-act="reviewsms'+did+'📩 Review SMS</button>';
+    }else{
+      actions+='<button class="btn small" data-act="remind'+did+'🔔 Remind</button>'+
+        (type==='booking'?'<button class="btn small" data-act="schedule'+did+'📋 Schedule</button>':'')
+        +'<button class="btn small" data-act="complete'+did+'✓ Complete</button>';
+    }
+    actions+='<button class="btn small" data-act="comment'+did+'>💬 Note</button>';
+    actions+='<button class="btn small" data-act="edit'+did+'>✏️ Edit</button>';
+    if(type==='booking')actions+='<button class="btn small" data-act="paylink'+did+'>'+(item.paymentLink?'💳 Pay':'💳 +Link')+'</button>';
+    if(!item.shared)actions+='<button class="btn small danger" data-act="del'+did+'Delete</button>';
+    return '<div class="card"><div class="row-badges"><span class="badge '+(type==='job'?'job':'')+'">'+(type==='job'?'Job':'Booking')+'</span>'+statusChip(item,type)+(item.source==='connecteam'?'<span class="badge">Connecteam</span>':(item.shared?'<span class="badge cloud">☁️ Muse</span>':''))+'</div>'+
+      '<h3>'+esc(item.client)+'</h3><p class="meta">'+esc(when)+'</p>'+yardStr+'<p class="meta">'+route+'</p>'+
+      ((crewNames.length)?'<p class="meta">👷 '+esc(crewNames.join(', '))+'</p>':'')+
+      '<div class="card-actions">'+actions+'</div>'+
+      (openDetail===item.id?detailPane(item):'')+
+      (openComments===item.id?commentThread(item,type):'')+'</div>';
+  }
+  function detailPane(item){
+    var h='<div class="cthread">';
+    if(item.reference)h+='<div class="drow"><div class="dl">Reference</div><div class="dv">'+esc(item.reference)+'</div></div>';
+    if(item.notes)h+='<div class="drow"><div class="dl">Details</div><div class="dv">'+esc(item.notes)+'</div></div>';
+    if(item.source==='connecteam')h+='<div class="drow"><div class="dl">Source</div><div class="dv">Scheduled in Connecteam</div></div>';
+    if(item.api_id)h+='<div class="drow"><div class="dl">Crew responses</div><div class="dv" id="resp-'+item.id+'"><span class="meta">Loading…</span></div></div>';
+    return h+'</div>';
+  }
+  function loadJobResponses(item){
+    if(!item.api_id)return;
+    var box=document.getElementById('resp-'+item.id);
+    if(!box)return;
+    apiCall('GET','/jobs/'+item.api_id+'/responses').then(function(rows){
+      if(!rows||!rows.length){box.innerHTML='<span class="meta">No responses yet</span>';return}
+      box.innerHTML=rows.map(function(r){
+        var icon=r.response==='accept'?'✅':'❌';
+        var txt=icon+' '+esc(r.crew_name)+(r.reason?' — '+esc(r.reason):'');
+        return '<div>'+txt+'</div>';
+      }).join('');
+    }).catch(function(){box.innerHTML='<span class="meta">Could not load</span>'});
+  }
+  function sorted(list){return list.slice().sort(function(a,b){return (a.date||'').localeCompare(b.date||'')})}
+  function isAutoCleaned(x){var n=(x.notes||'').toUpperCase();return x.status==='cancelled'&&(n.indexOf('DUPLICATE')>-1||n.indexOf('MERGED')>-1||n.indexOf('AUTO-CLEANED')>-1)}
+  function dashFilter(x){if(isAutoCleaned(x))return false;return (dashF==='all'||statusGroup(x)===dashF)&&matchQ(x)}
+  // All jobs now come from DB (server-first). Bookings section shows non-job entries.
+  var allJobs=sorted(DB.jobs).filter(dashFilter);
+  var b=allJobs.filter(function(x){return x.type==='booking'});
+  var j=allJobs.filter(function(x){return x.type!=='booking'});
+  $('bookingList').innerHTML=b.length?b.map(function(x){return card(x,'booking')}).join(''):emptyDashMsg('booking');
+  $('jobList').innerHTML=j.length?j.map(function(x){return card(x,'job')}).join(''):emptyDashMsg('job');
+  // Show matching quotes when searching.
+  var qBox=$('quoteSearchList'), qTitle=$('quoteSectionTitle');
+  if(qBox&&qTitle){
+    if(dashQ&&dashQ.trim()){
+      var ql=allQuotes().filter(function(q){
+        var hay=((q.client||q.name||'')+' '+(q.quote_no||'')+' '+(q.email||'')+' '+(q.phone||'')+' '+(q.move_desc||'')).toLowerCase();
+        return dashQ.toLowerCase().split(/\s+/).every(function(w){return w&&hay.indexOf(w)>-1});
+      });
+      if(ql.length){
+        qTitle.style.display='';
+        qBox.innerHTML=ql.slice(0,5).map(function(q){
+          return '<div class="card" style="padding:10px 12px;margin-bottom:8px">'
+            +'<div style="display:flex;justify-content:space-between;align-items:center">'
+            +'<div><b>'+esc(q.client||q.name||'Quote')+'</b> <span class="meta">'+esc(q.quote_no||'')+'</span><br>'
+            +'<span class="meta">'+esc(q.move_desc||'')+' · '+money(q.amount||0)+'</span></div>'
+            +'<button class="btn small" onclick="showTab(\'tab-quote\')">View →</button>'
+            +'</div></div>';
+        }).join('')+(ql.length>5?'<p class="meta" style="text-align:center">+'+(ql.length-5)+' more in Quote tab</p>':'');
+      } else { qTitle.style.display='none'; qBox.innerHTML=''; }
+    } else { qTitle.style.display='none'; qBox.innerHTML=''; }
+  }
+  var dl=$('clientList');dl.innerHTML='';var names={};DB.jobs.forEach(function(x){names[x.client]=1});Object.keys(names).forEach(function(n){var o=document.createElement('option');o.value=n;dl.appendChild(o)});
+  renderMonth();
+}
+document.addEventListener('click',function(e){
+  var qv=e.target.closest('[data-qview]');
+  if(qv){openQuote=(openQuote===qv.dataset.qview?null:qv.dataset.qview);renderQuotes();return}
+  var t=e.target.closest('[data-act],[data-type].status');if(!t)return;
+  var type=t.dataset.type,id=t.dataset.id;
+  var item=DB.getById(id);if(!item)return;
+  if(t.classList.contains('status')){var cur=item.status;item.status=(cur==='done'||cur==='completed')?(type==='booking'?'booked':'scheduled'):(type==='booking'?'completed':'done');save();renderDash();if(item.api_id){var ns=(item.status==='done'||item.status==='completed')?'completed':'booked';apiCall('PATCH','/jobs/'+item.api_id,{status:ns},true).catch(function(){})}return}
+  var act=t.dataset.act;
+  if(act==='copy')copyText(item.link,'Link copied');
+  else if(act==='view')openFromManager(item.link);
+  else if(act==='detail'){openDetail=(openDetail===id?null:id);openComments=null;renderDash();if(openDetail){var it=list.find(function(x){return x.id===id});if(it)setTimeout(function(){loadJobResponses(it)},50);}}
+  else if(act==='paylink'){
+    if(item.paymentLink){window.open(item.paymentLink,'_blank')}
+    else{var v=window.prompt('Paste the Square payment link for this booking:');if(v&&v.trim()){item.paymentLink=v.trim();save();renderDash();toast('Payment link saved')}}
+  }
+  else if(act==='remind')dispatchForItem(type,item);
+  else if(act==='schedule'&&type==='booking')scheduleBooking(item);
+  else if(act==='complete')completeBooking(item);
+  else if(act==='review')reviewEmail(item);
+  else if(act==='reviewsms')reviewSms(item);
+  else if(act==='comment'){openComments=(openComments===id?null:id);openDetail=null;renderDash();var ci=$('cinput');if(ci)ci.focus();}
+  else if(act==='edit'){
+    var eItem=DB.getById(id);
+    if(!eItem){ toast('Item not found'); return; }
+    if(eItem.type==='booking' && !eItem.api_id){
+      // Local booking — edit directly in localStorage
+      openLocalBookingEdit(eItem);
+      return;
+    }
+    if(eItem.api_id){
+      // It's a job in the DB — fetch full details and open edit form
+      toast('Loading job…');
+      apiCall('GET','/jobs/'+eItem.api_id).then(function(j){
+        if(!j||!j.id){ toast('Job not found'); return; }
+        // Open in schedule edit form (reuse the same UI)
+        showTab('tab-sched');
+        setTimeout(function(){
+          // Create a temporary job object in the schedule format
+          var tmpJob={
+            client_name: j.client_name||eItem.client,
+            date: j.date,
+            yard_meet: j.yard_meet,
+            start_time: j.start_time,
+            pickup: j.pickup,
+            dropoff: j.dropoff,
+            notes: j.special_instructions||j.notes,
+            special_instructions: j.special_instructions,
+            crew: j.crew
+          };
+          // Store for the edit form
+          if(!window._schedDayJobs) window._schedDayJobs={};
+          window._schedDayJobs['edit-'+j.id]=tmpJob;
+          // Show the edit form directly
+          var det=$('sched-detail'), box=$('sched-list');
+          if(box) box.style.display='none';
+          if(det){ det.style.display=''; showSchedEditForm(j.id, tmpJob, 'dash'); }
+        }, 300);
+      }).catch(function(){ toast('Could not load job'); });
+    }else{
+      toast('Only database jobs can be edited (not local bookings)');
+    }
+    return;
+  }
+  else if(act==='commentadd'){
+    var ci2=$('cinput'),v=ci2?ci2.value.trim():'';
+    if(!v){toast('Write the note first');return}
+    state.comments=state.comments||{};
+    (state.comments[id]=state.comments[id]||[]).push({t:new Date().toISOString(),text:v});
+    save();renderDash();toast('Note saved');
+  }
+  else if(act==='del'&&confirm('Delete this '+(type==='booking'?'booking':'job')+'?')){
+    var apiId=item.api_id;
+    var i=list.indexOf(item);list.splice(i,1);save();renderDash();
+    if(apiId){
+      apiCall('DELETE','/jobs/'+apiId).then(function(){
+        toast('Deleted');
+        DB.refresh();
+      }).catch(function(){toast('Deleted locally — server delete failed')});
+    }
+  }
+});
+
+function scheduleBooking(b){
+  // Pre-fill the Job form from a booking, then switch to the Job tab.
+  showTab('tab-job');
+  $('j-client').value=b.client||'';
+  $('j-date').value=b.date||'';
+  if(b.time)$('j-pickupTime').value=b.time;
+  $('j-pickup').value=b.pickup||'';
+  $('j-dropoff').value=b.dropoff||'';
+  if(b.phone)$('j-clientPhone').value=b.phone;
+  if(b.email)$('j-clientEmail').value=b.email;
+  if(b.quote||b.reference)$('j-quote').value=b.quote||b.reference||'';
+  toast('Booking loaded — pick crew, adjust details, then hit "Create job & notify crew"');
+  window.scrollTo(0,0);
+}
+
+/* auto-reminder dispatch: one tap emails Muse's inbox, a daily sweep turns it into reminders */
+function crewContact(name){var c=(state.crew||[]).find(function(x){return x.name===name});return c||{name:name,phone:'',email:''}}
+function sendDispatch(d){
+  var lines=['[Auto-reminder dispatch — internal, do not forward to the client]'];
+  Object.keys(d).forEach(function(k){var v=d[k];if(v!==''&&v!=null)lines.push(k+': '+v)});
+  var subj='[Dispatch] '+d.Type+' — '+d.Client+' — '+d.Date;
+  location.href='mailto:'+encodeURIComponent(state.settings.email)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(lines.join('\n'));
+  toast('Dispatch email opened — just hit send');
+}
+function dispatchForItem(type,item){
+  var d;
+  if(type==='booking'){
+    d={Type:'Booking',Client:item.client,ClientEmail:item.email||'',ClientPhone:item.phone||'',Date:item.date,Time:item.time||'',Pickup:item.pickup,Dropoff:item.dropoff,Movers:item.movers,Minimum:item.minimum,Hourly:item.hourly||'',Reference:item.reference||'',BookingLink:item.link,Notes:item.notes||''};
+  }else{
+    var crew=item.crew||[];
+    d={Type:'Job',Client:item.client,ClientEmail:item.clientEmail||'',ClientPhone:item.clientPhone||'',Date:item.date,
+      YardTime:item.yardTime?fitTime12(item.yardTime):'',PickupTime:item.pickupTime?fitTime12(item.pickupTime):'',
+      YardAddress:item.yardAddress||'',Pickup:item.pickup,Dropoff:item.dropoff,Movers:item.movers||'',Minimum:item.minimum||'',
+      Crew:crew.join(', '),
+      CrewEmails:crew.map(function(n){return crewContact(n).email}).filter(function(x){return x}).join(', '),
+      CrewPhones:crew.map(function(n){return crewContact(n).phone}).filter(function(x){return x}).join(', '),
+      StaffLink:item.link,Notes:item.notes||''};
+  }
+  sendDispatch(d);
+}
+
+/* post-move review ask: ✓ Complete marks the booking done and opens the thank-you + review request */
+var REVIEW_LINK='https://g.page/r/Ce3DH2bZSpGZEBE/review';
+var REVIEW_SUBJECT='How was your move?';
+function reviewFirst(item){var n=(item.client||'there').split('&')[0].trim().split(/\s+/)[0];return n||'there'}
+function reviewEmailBody(item){
+  var pay=item.paymentLink?'\n\nYou can pay your balance securely online here:\n'+item.paymentLink+'\n':'';
+  return 'Hi '+reviewFirst(item)+',\n\nThank you for moving with Icando Movers & Transportation — I hope you\'re settling in well!\n\nIcando Movers & Transportation would love your feedback. Post a review to our profile:\n'+REVIEW_LINK+'\n\nKnow someone planning a move? We\'d love an introduction — just reply here or send them our number: 204-229-5871.\n\nAnd if anything wasn\'t perfect, reply to this email and I\'ll make it right personally.'+pay+'\n\nWarm regards,\nNelson\nIcando Movers & Transportation\n'+state.settings.phone+'\n'+state.settings.email;
+}
+function reviewEmail(item){
+  if(!item.email){toast('No email on this booking');return}
+  window.location.href='mailto:'+encodeURIComponent(item.email)+'?subject='+encodeURIComponent(REVIEW_SUBJECT)+'&body='+encodeURIComponent(reviewEmailBody(item));
+}
+function reviewSms(item){
+  if(!item.phone){toast('No phone number on this booking');return}
+  var body='Hi '+reviewFirst(item)+', thanks for moving with Icando Movers! We\'d love your feedback — post a review to our profile: '+REVIEW_LINK+' Know someone moving? Send them our number 204-229-5871.'+(item.paymentLink?' Pay your balance here: '+item.paymentLink:'')+' — Nelson';
+  window.location.href='sms:'+encodeURIComponent(item.phone)+'?body='+encodeURIComponent(body);
+}
+function completeBooking(item){
+  item.status='completed';save();renderDash();
+  var done=function(){ reviewEmail(item); };
+  if(!item.api_id){ done(); return; }
+  apiCall('PATCH','/jobs/'+item.api_id,{status:'completed'},true).catch(function(){});
+  // Ask how the client is paying: invoice only for Card / E-transfer, never for Cash.
+  pickPaymentMethod(function(method){
+    if(method==='cash'){
+      apiCall('PATCH','/jobs/'+item.api_id,{payment_method:'cash'},true).catch(function(){});
+      done(); return;
+    }
+    // Card or e-transfer: create the Helcim invoice for the thank-you email.
+    apiCall('GET','/jobs/'+item.api_id,null,true).then(function(job){
+      var price=job&&job.price?Number(job.price):0;
+      if(!price||job.payment_status==='paid'){ done(); return; }
+      var key=getManagerKeySilent();
+      fetch('/.netlify/functions/helcim-pay',{method:'POST',
+        headers:{'Content-Type':'application/json','x-manager-key':key},
+        body:JSON.stringify({job_id:item.api_id, amount:price,
+          client_name:job.client_name, client_email:item.email||'',
+          description:'Moving services — '+fmtDate(String(job.date).slice(0,10)),
+          movers_count:job.movers_count||item.movers||2,
+          billable_hours:job.billable_hours||job.actual_hours||0,
+          payment_method:method})})
+        .then(function(r){return r.json()}).then(function(inv){
+          if(inv&&inv.payment_url){
+            item.paymentLink=inv.payment_url;save();
+            apiCall('PATCH','/jobs/'+item.api_id,{payment_link:inv.payment_url,payment_method:method},true).catch(function(){});
+            toast('Helcim invoice created — payment link added to the email');
+          }
+          done();
+        }).catch(function(){ done(); });
+    }).catch(function(){ done(); });
+  });
+}
+
+/* Payment-method picker for ✓ Complete: Card / E-transfer / Cash. */
+function pickPaymentMethod(cb){
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML='<div style="background:#fff;border-radius:12px;padding:20px;max-width:320px;width:100%;text-align:center">'
+    +'<div style="font-weight:700;margin-bottom:4px">How is the client paying?</div>'
+    +'<div style="font-size:13px;color:#666;margin-bottom:16px">Invoice is created for Card &amp; E-transfer only.</div>'
+    +'<button data-m="card" style="display:block;width:100%;margin:8px 0;padding:12px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;font-size:16px">💳 Card</button>'
+    +'<button data-m="etransfer" style="display:block;width:100%;margin:8px 0;padding:12px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;font-size:16px">🏦 E-transfer</button>'
+    +'<button data-m="cash" style="display:block;width:100%;margin:8px 0;padding:12px;border:1px solid #ddd;border-radius:8px;background:#f8f8f8;font-size:16px">💵 Cash</button>'
+    +'</div>';
+  ov.addEventListener('click',function(e){
+    var m=e.target&&e.target.getAttribute?e.target.getAttribute('data-m'):null;
+    if(m){ document.body.removeChild(ov); cb(m); }
+    else if(e.target===ov){ document.body.removeChild(ov); cb('cash'); }
+  });
+  document.body.appendChild(ov);
+}
+
+/* shared records: bookings/jobs created in chat with Muse live in ledger.json on the site.
+   The app merges them into the dashboard (marked "Muse") for complete records + monthly tracking. */
+function ledgerUrl(){return 'ledger.json?v='+Date.now()}
+var syncing=false;
+function syncPull(manual){
+  if(syncing)return;syncing=true;
+  var key=manual?getManagerKey():getManagerKeySilent();
+  if(!key){syncing=false;if(manual)toast('Manager key required');return}
+  DB.refresh().then(function(){
+    syncing=false;
+    renderDash();
+    if(manual)toast('Records synced');
+  }).catch(function(){
+    syncing=false;
+    if(manual)toast('Sync failed — check connection');
+  });
+}
+/* month summary */
+function monthSummary(){
+  var now=new Date(),ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var mname=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  var bs=DB.jobs.filter(function(x){return x.type==='booking'&&(x.date||'').slice(0,7)===ym});
+  var js=DB.jobs.filter(function(x){return x.type!=='booking'&&(x.date||'').slice(0,7)===ym});
+  var est=bs.reduce(function(a,x){return a+(parseFloat(x.minimum)||0)},0);
+  return{mname:mname,nb:bs.length,nj:js.length,est:est};
+}
+function renderMonth(){
+  var ms=monthSummary(),box=$('monthSummary');if(!box)return;
+  box.innerHTML='<div class="card"><div class="row-badges"><span class="badge">This month</span><span class="meta">'+ms.mname+'</span></div>'+
+    '<div class="month-nums"><div><b>'+ms.nb+'</b><span>bookings</span></div>'+
+    '<div><b>'+money(Math.round(ms.est))+'</b><span>est. minimum</span></div>'+
+    '<div><b>'+ms.nj+'</b><span>jobs</span></div></div>'+
+    '<button class="btn small" id="syncNow">↻ Sync records</button></div>';
+  $('syncNow').onclick=function(){toast('Syncing…');syncPull(true)};
+}
+
+/* new booking */
+function openFromManager(link){if(!link){toast('No page for this record');return}var sep=link.indexOf('?')>-1?'&':'?';window.open(link+sep+'from=manager','_blank')}
+function fillBookingForm(f){['client','email','phone','date','time','pickup','dropoff','movers','minimum','hourly','duration','reference','travel','notes'].forEach(function(k){var n=$('b-'+k);if(n&&f[k]!=null)n.value=f[k]})}
+$('b-generate').addEventListener('click',function(){
+  var f={client:$('b-client').value.trim(),email:$('b-email').value.trim(),phone:$('b-phone').value.trim(),date:$('b-date').value,time:$('b-time').value,pickup:$('b-pickup').value.trim(),dropoff:$('b-dropoff').value.trim(),movers:$('b-movers').value.trim(),minimum:$('b-minimum').value.trim(),hourly:$('b-hourly').value.trim(),duration:$('b-duration').value.trim(),reference:$('b-reference').value.trim(),travel:$('b-travel').value.trim(),notes:$('b-notes').value.trim(),paymentLink:$('b-paylink').value.trim()};
+  if(!f.client||!f.date||!f.time||!f.pickup||!f.dropoff||!f.movers||!f.minimum){toast('Fill client, date, time, addresses, movers and minimum');return}
+  var link=bookingLink(f);
+  // Server-first: create via API, then refresh DB.
+  apiCall('POST','/jobs',{client_name:f.client,date:f.date,start_time:f.date&&f.time?f.date+'T'+f.time+':00':null,crew:[],movers_count:parseInt(f.movers,10)||null,pickup:f.pickup,dropoff:f.dropoff,status:'booked',price:parseFloat(f.minimum)||null,quote_no:f.reference||null},true).then(function(r){
+    return DB.refresh();
+  }).then(function(){
+    renderDash();
+    toast('Booking saved');
+  }).catch(function(){ toast('Could not save booking — check connection'); });
+  rememberAddress(f.pickup);rememberAddress(f.dropoff);save();
+  $('b-link').textContent=link;$('b-result').hidden=false;
+  $('b-copy').onclick=function(){copyText(link,'Booking link copied')};
+  $('b-open').onclick=function(){openFromManager(link)};
+  $('b-dispatch').onclick=function(){toast('Use the Schedule tab to find the booking')};
+  $('b-mail').onclick=function(){
+    var subj='Booking confirmation';
+    var body='Hello '+f.client+',\n\nPlease find below your booking confirmation.\n\nView your booking: '+link+'\n\nMove details:\n- Date: '+fmtDate(f.date)+' at '+fmtTime12(f.time)+'\n- Pickup: '+f.pickup+'\n- Drop-off: '+f.dropoff+'\n- Crew: '+f.movers+' movers, '+money(f.minimum)+' minimum'+(f.reference?'\n- Booking reference: '+f.reference:'')+'\n\nBilling: our rate is hourly. Time beyond a full hour: 15 minutes or more is billed at the full hourly rate; under 15 minutes is billed at half the hourly rate.\n\nWarm regards,\nNelson\nIcando Movers & Transportation\n'+state.settings.phone+'\n'+state.settings.email;
+    window.location.href='mailto:'+(f.email||'')+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+  };
+  $('b-sms').onclick=function(){
+    if(!f.phone){toast('Add the client\'s phone number to send the SMS');return}
+    var body='Hi '+f.client+'! Your Icando Movers booking is confirmed: '+fmtDate(f.date)+' at '+fmtTime12(f.time)+'. '+f.movers+' movers ('+money(f.minimum)+' min). Pickup: '+f.pickup+' → Drop-off: '+f.dropoff+'. Full details + booking link sent to your email. Questions? Call/text '+state.settings.phone+' — Nelson';
+    window.location.href='sms:'+encodeURIComponent(f.phone)+'?body='+encodeURIComponent(body);
+  };
+  toast('Booking saved');
+});
+
+/* new job */
+function renderCrewChecks(){var box=$('j-crew');box.innerHTML='';state.crew.forEach(function(c){var l=document.createElement('label');l.className='check';var cb=document.createElement('input');cb.type='checkbox';cb.value=c.name;l.appendChild(cb);l.appendChild(document.createTextNode(c.name));box.appendChild(l)})}
+$('j-generate').addEventListener('click',function(){
+  var crew=[];document.querySelectorAll('#j-crew input:checked').forEach(function(c){crew.push(c.value)});
+  var f={client:$('j-client').value.trim(),date:$('j-date').value,yardTime:$('j-yardTime').value,pickupTime:$('j-pickupTime').value,yardAddress:$('j-yardAddress').value.trim(),pickup:$('j-pickup').value.trim(),dropoff:$('j-dropoff').value.trim(),quote:$('j-quote').value.trim(),movers:$('j-movers').value.trim(),minimum:$('j-minimum').value.trim(),crew:crew,clientPhone:$('j-clientPhone').value.trim(),clientEmail:$('j-clientEmail').value.trim(),notes:$('j-notes').value.trim()};
+  if(!f.client||!f.date||!f.pickup||!f.dropoff){toast('Fill client, date, pickup and drop-off');return}
+  rememberAddress(f.pickup);rememberAddress(f.dropoff);rememberAddress(f.yardAddress);save();
+  // Server-first: create via API, then refresh DB.
+  apiCall('POST','/jobs',{client_name:f.client,date:f.date,start_time:f.date&&f.pickupTime?f.date+'T'+f.pickupTime+':00':null,crew:crew.map(function(n){return{name:n}}),movers_count:crew.length||parseInt(f.movers,10)||null,pickup:f.pickup,dropoff:f.dropoff,yard_meet:f.yardAddress||null,status:'booked',price:parseFloat(f.minimum)||null,quote_no:f.quote||null}).then(function(r){
+    if(r&&r.id){
+      // Notify each assigned crew member via push
+      var notified=0;
+      crew.forEach(function(cname){
+        apiCall('POST','/notify-crew',{type:'job_assigned',title:'New job: '+f.client,body:f.date+' · '+f.pickup+' → '+f.dropoff,crew_name:cname,job_id:r.id}).then(function(){notified++;if(notified===crew.length)toast('Job created — '+crew.length+' crew notified')}).catch(function(){});
+      });
+      if(!crew.length)toast('Job created');
+      return DB.refresh();
+    }
+  }).then(function(){ renderDash(); }).catch(function(){toast('Could not create job — check connection')});
+  $('j-result').hidden=true;
+});
+
+var CITY_FEES=[["Altona", 240], ["Argyle", 240], ["Arborg", 300], ["Beausejour", 240], ["Belmont", 170], ["Berens River 13", null], ["Birds Hill", 200], ["Bloodvein", 1100], ["Blumenort (North)", 240], ["Boissevain", 900], ["Brandon", 800], ["Carberry", 600], ["Carman", 260], ["Chemawawin 2", 200], ["Cross Lake 19", 2000], ["Cross Lake 19A", 2100], ["Crystal City", 600], ["Dauphin", 1000], ["East Saint Paul", 200], ["Ebb and Flow 52", 800], ["Elphinstone", 900], ["Eriksdale", 500], ["Falcon Lake", 400], ["Fisher River 44", 800], ["Flin Flon", 2000], ["Fort Alexander 3", 400], ["Garden Hill First Nation", null], ["Gillam", 3000], ["Gimli", 300], ["Gladstone", 500], ["God's Lake 23", null], ["Grand Marais", 500], ["Grandview", 1000], ["Grunthal", 240], ["Hanover", 260], ["Headingley", 200], ["Ile-des-Chenes", 200], ["Inglis", 1000], ["Killarney", 800], ["La Broquerie", 300], ["La Riviere", 220], ["La Salle", 200], ["Lac du Bonnet", 280], ["Landmark", 200], ["Lockport", 240], ["Long Plain (Part) 6", 300], ["Lorette", 200], ["Lundar", 300], ["Lynne Lake", 3000], ["MacGregor", 300], ["Manitou", 500], ["Melita", 1000], ["Minitonas", 1500], ["Minnedosa", 700], ["Minto", 800], ["Mitchell", 240], ["Moose Lake", 2000], ["Morden", 300], ["Morris", 240], ["Nelson House 170", 2500], ["Neepawa", 600], ["Niverville", 200], ["Norway House 17", 2200], ["Oak Bluff", 200], ["Oakbank", 200], ["Opaskwayak Cree Nation 21E", 1800], ["Oxford House 24", null], ["Peguis 1B", 600], ["Pinawa", 300], ["Portage la Prairie", 260], ["Powerview-Pine Falls", 400], ["Pukatawagan 198", null], ["Rivers", 900], ["Riverton", 400], ["Roblin", 1200], ["Russell", 1000], ["Saint Eustache", 240], ["Saint Germain", 220], ["Sanford", 200], ["Sandy Bay 5", 600], ["Sandy Lake", 900], ["Sandyhook", 290], ["Selkirk", 240], ["Shilo CFB-BFC", 600], ["Souris", 800], ["Split Lake (Part) 171", 2700], ["St Laurent", 300], ["St Malo", 240], ["St. Adolphe", 200], ["St-Pierre-Jolys", 240], ["Starbuck", 240], ["Ste. Anne", 240], ["Ste. Rose du Lac", 900], ["Ste-Geneviève", 220], ["Steinbach", 240], ["Stonewall", 240], ["Stony Mountain", 200], ["Swan River", 1500], ["Teulon", 240], ["The Pas", 1800], ["Thompson", 2000], ["Tyndall-Garson", 260], ["Virden", 800], ["Wasagamack", null], ["Waywayseecappo First Nation", 1000], ["West Saint Paul", 200], ["Winkler", 300], ["Winnipeg Beach", 280]];
+function qCityOptions(){var sel=$('q-city');sel.innerHTML='<option value="">Select a city…</option>'+CITY_FEES.map(function(c,i){return '<option value="'+i+'">'+c[0].replace(/&/g,'&amp;').replace(/</g,'&lt;')+(c[1]==null?' — call for rate':' — $'+c[1])+'</option>'}).join('')}
+function qApplyCity(){var i=$('q-city').value;if(i==='')return;var fee=CITY_FEES[+i][1];if(fee!=null){$('q-travel').value=fee;quoteCalc()}else{toast('Call the client to confirm this rate')}}
+/* quote calculator */
+var qArea='within',qMovers='2';
+function segWire(id,fn){var s=$(id);s.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){s.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');fn(b.dataset.v)})})}
+function quoteCalc(){
+  var hourly=Math.max(0,parseFloat($('q-hourly').value)||0);
+  var hours=Math.max(0.5,parseFloat($('q-hours').value)||0);
+  var travel=Math.max(0,parseFloat($('q-travel').value)||0);
+  var minimum=Math.round(hourly*hours+travel);
+  var hrs=(Math.round(hours*100)/100)+' hour'+(hours===1?'':'s');
+  var rows=[['Crew',qMovers+' movers · '+money(hourly)+'/hr'],['Minimum',hrs+' · '+money(Math.round(hourly*hours))],['Travel & service',money(travel)],['Additional time',money(hourly)+'/hr']];
+  $('q-out').innerHTML='<div style="font-size:.85rem;opacity:.85">Minimum total before applicable tax</div><div class="total">'+money(minimum)+'</div>'+
+    rows.map(function(r){return '<div class="line"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>'}).join('')+
+    '<div style="margin-top:10px;font-size:.82rem;opacity:.85">E-transfer +5% GST · Card +3% fee and 5% GST · Cash no GST</div>';
+  return {movers:qMovers,minimum:minimum,hourly:hourly,hours:hours,travel:travel};
+}
+function qReset(){var d={hourly:qMovers==='3'?170:120,hours:3,travel:qArea==='within'?(qMovers==='3'?155:120):240};$('q-hourly').value=d.hourly;$('q-hours').value=d.hours;$('q-travel').value=d.travel}
+/* sent quotes: local saves + engine tracker */
+var engineQuotes=[], currentQuoteNo=null, currentQuoteName='', openQuote=null;
+function allQuotes(){
+  var seen={},out=[];
+  (state.quotes||[]).concat(engineQuotes).forEach(function(q){
+    var k=q.quote_no||q.id;
+    if(k&&!seen[k]){seen[k]=1;out.push(q)}
+  });
+  return out.sort(function(a,b){return (b.sent_date||'').localeCompare(a.sent_date||'')});
+}
+function quoteStatusChip(q){
+  var s=q.status||'quoted';
+  var label={quoted:'Quoted',responded:'Responded',booked:'Booked',dormant:'Dormant',lost:'Lost',expired:'Expired'}[s]||s;
+  return '<span class="qstat">'+label+'</span>';
+}
+function quoteDetail(q){
+  var h='<div class="cthread">';
+  if(q.amount)h+='<div class="drow"><div class="dl">Quoted amount</div><div class="dv">'+money(q.amount)+' minimum</div></div>';
+  if(q.movers)h+='<div class="drow"><div class="dl">Crew</div><div class="dv">'+q.movers+' movers'+(q.hourly?' · '+money(q.hourly)+'/hr':'')+(q.travel?' · '+money(q.travel)+' travel':'')+'</div></div>';
+  if(q.pickup)h+='<div class="drow"><div class="dl">Pickup</div><div class="dv">'+esc(q.pickup)+'</div></div>';
+  if(q.dropoff)h+='<div class="drow"><div class="dl">Drop-off</div><div class="dv">'+esc(q.dropoff)+'</div></div>';
+  if(q.phone||q.email)h+='<div class="drow"><div class="dl">Contact</div><div class="dv">'+esc([q.phone,q.email].filter(Boolean).join(' · '))+'</div></div>';
+  if(q.notes)h+='<div class="drow"><div class="dl">Notes</div><div class="dv">'+esc(q.notes)+'</div></div>';
+  var fu=q.followups||{};
+  var steps=['day2','day5','day10'].filter(function(k){return fu[k]}).map(function(k){return k.replace('day','Day ')+': '+fu[k]}).join(' · ');
+  h+='<div class="drow"><div class="dl">Follow-ups</div><div class="dv">'+esc(steps||'none yet')+'</div></div>';
+  return h+'</div>';
+}
+function renderQuotes(){
+  var qs=allQuotes();
+  $('quoteList').innerHTML=qs.length?qs.map(function(q){
+    var key=q.quote_no||q.id, open=openQuote===key;
+    return '<div class="card"><div class="row-badges"><span class="badge">Quote</span>'+quoteStatusChip(q)+'</div>'+
+    '<h3>'+esc(q.client||'—')+'</h3>'+
+    '<p class="meta">'+esc(q.quote_no||'')+(q.amount?' · '+money(q.amount):'')+'</p>'+
+    (q.move_desc?'<p class="meta">'+esc(q.move_desc)+'</p>':'')+
+    '<p class="meta">Sent '+esc(q.sent_date||'—')+(q.move_date?' · moves '+esc(fmtDate(q.move_date)):'')+'</p>'+
+    '<div class="card-actions"><button class="btn small" data-qview="'+esc(key)+'">'+(open?'▲ Hide':'👁 View')+'</button></div>'+
+    (open?quoteDetail(q):'')+'</div>';
+  }).join(''):'<div class="card empty">No saved quotes yet — build one above and tap 💾 Save.</div>';
+}
+function syncQuotes(){
+  fetch('quotes.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(d){
+    if(d&&d.quotes){engineQuotes=d.quotes;renderQuotes();renderDash()}
+  }).catch(function(){});
+}
+function saveCurrentQuote(){
+  var name=$('q-client').value.trim();
+  if(!name){toast('Add the client name first');$('q-client').focus();return null}
+  if(currentQuoteNo&&currentQuoteName!==name)currentQuoteNo=null;
+  var q=quoteCalc();
+  if(!currentQuoteNo)currentQuoteNo=nextQuoteNo();
+  currentQuoteName=name;
+  var rec={id:'q'+Date.now().toString(36),quote_no:currentQuoteNo,client:name,
+    amount:q.minimum,movers:q.movers,hours:q.hours,hourly:q.hourly,travel:q.travel,
+    move_date:$('q-movedate').value||'',pickup:$('q-pickup').value.trim(),dropoff:$('q-dropoff').value.trim(),
+    move_desc:q.movers+'-mover '+(qArea==='within'?'Winnipeg':'outside-Winnipeg')+' move',
+    notes:$('q-notes').value.trim(),sent_date:new Date().toISOString().slice(0,10),status:'quoted'};
+  state.quotes=state.quotes||[];
+  var ix=state.quotes.findIndex(function(x){return x.quote_no===currentQuoteNo});
+  if(ix>-1)state.quotes[ix]=rec;else state.quotes.push(rec);
+  save();renderQuotes();toast('Quote '+currentQuoteNo+' saved');
+  return rec;
+}
+function quoteText(){
+  var q=quoteCalc(),name=$('q-client').value.trim(),notes=$('q-notes').value.trim();
+  var area=qArea==='within'?'within Winnipeg':'outside Winnipeg';
+  var hrs=Math.round(q.hours*100)/100;
+  var L=['Hello '+(name||'there')+',','','Here is your moving quote from Icando Movers & Transportation:','',
+    q.movers+' movers · '+area,
+    'Minimum: '+money(q.minimum)+' ('+hrs+' hour'+(hrs===1?'':'s')+' at '+money(q.hourly)+'/hr + '+money(q.travel)+' travel & service)',
+    'Additional time: '+money(q.hourly)+'/hr, billed hourly. Time beyond a full hour: 15 minutes or more is billed at the full hourly rate; under 15 minutes is billed at half the hourly rate.',
+    'Payment due after completion: e-transfer +5% GST, credit card +3% fee and 5% GST, or cash (no GST added).'];
+  if(notes){L.push('');L.push('Note: '+notes)}
+  if(currentQuoteNo){L.push('','Quote ref: '+currentQuoteNo)}
+  L.push('','This quote is valid for 14 days.','','Warm regards,','Nelson','Icando Movers & Transportation',state.settings.phone,state.settings.email);
+  return L.join('\n');
+}
+function fallbackCopy(t){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Quote copied — paste it to the client')}catch(e){toast('Copy failed — long-press to copy manually')}document.body.removeChild(ta)}
+segWire('q-area',function(v){qArea=v;$('q-cityWrap').hidden=(v!=='outside');qReset();quoteCalc()});
+$('q-city').addEventListener('change',qApplyCity);
+segWire('q-movers',function(v){qMovers=v;qReset();quoteCalc()});
+['q-hourly','q-hours','q-travel'].forEach(function(id){$(id).addEventListener('input',quoteCalc)});
+$('q-use').addEventListener('click',function(){var q=quoteCalc();fillBookingForm({movers:q.movers,minimum:q.minimum,hourly:q.hourly,travel:q.travel,duration:String(Math.round(q.hours*100)/100)});showTab('tab-booking');toast('Quote applied to booking form')});
+$('q-save').addEventListener('click',function(){saveCurrentQuote()});
+$('q-copy').addEventListener('click',function(){if(!saveCurrentQuote())return;var t=quoteText();if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('Quote copied — paste it to the client')},function(){fallbackCopy(t)})}else fallbackCopy(t)});
+$('q-email').addEventListener('click',function(){if(!saveCurrentQuote())return;location.href='mailto:?subject='+encodeURIComponent('Your moving quote — Icando Movers & Transportation')+'&body='+encodeURIComponent(quoteText())});
+$('q-wa').addEventListener('click',function(){if(!saveCurrentQuote())return;window.open('https://wa.me/?text='+encodeURIComponent(quoteText()),'_blank')});
+
+/* formal PDF quotation (same look as the emailed quotes) */
+function loadJsPDF(cb){
+  if(window.jspdf&&window.jspdf.jsPDF){cb();return}
+  if(document.querySelector('script[data-jspdf]')){var t=setInterval(function(){if(window.jspdf&&window.jspdf.jsPDF){clearInterval(t);cb()}},300);return}
+  var s=document.createElement('script');s.setAttribute('data-jspdf','1');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  s.onload=function(){cb()};s.onerror=function(){toast('Could not load PDF engine — check connection')};
+  document.head.appendChild(s);
+}
+function nextQuoteNo(){
+  var t=new Date(),ds=t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0');
+  state.quoteSeq=state.quoteSeq||{};
+  if(state.quoteSeq.date!==ds)state.quoteSeq={date:ds,n:0};
+  state.quoteSeq.n++;save();
+  return 'QT-'+ds.slice(0,4)+'-'+ds.slice(4,6)+ds.slice(6,8)+'-'+String(state.quoteSeq.n).padStart(2,'0');
+}
+function fmtUS(d){return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+function buildQuotePDF(doc,d){
+  var W=215.9,M=14;
+  var NAVY=[15,42,68],ORANGE=[242,101,34],GREY=[90,107,125],LIGHT=[242,245,248];
+  function money2(n){return '$'+Number(n).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}
+  function hrsLabel(h){var r=Math.round(h*100)/100;return r+' hour'+(r===1?'':'s')}
+  var y;
+  doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(0,0,W,26,'F');
+  try{doc.addImage(LOGO_IMG,'JPEG',M,5.2,38,14.8)}catch(e){}
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(11);
+  doc.text('Icando Movers & Transportation',W-M,10.5,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);
+  doc.text('Winnipeg, MB  |  '+d.phone+'  |  '+d.email,W-M,16.5,{align:'right'});
+  y=35;
+  doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.setFont('helvetica','bold');doc.setFontSize(20);
+  doc.text('QUOTATION',M,y);y+=3;
+  doc.setDrawColor(ORANGE[0],ORANGE[1],ORANGE[2]);doc.setLineWidth(1.1);doc.line(M,y,W-M,y);y+=7;
+  doc.setFontSize(10.5);doc.setTextColor(40,40,40);
+  doc.setFont('helvetica','bold');doc.text('Quote Reference:',M,y);
+  var rw=doc.getTextWidth('Quote Reference: ');
+  doc.setFont('helvetica','normal');doc.text(d.quoteNo,M+rw+1.5,y);
+  doc.setTextColor(GREY[0],GREY[1],GREY[2]);
+  doc.text('Issued: '+d.issued+'  \u00b7  Valid until: '+d.validUntil,W-M,y,{align:'right'});y+=10;
+  doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.setFont('helvetica','bold');doc.setFontSize(11.5);
+  doc.text('Client',M,y);y+=2.5;
+  var rows=[['Name:',d.clientName]];
+  if(d.moveDate)rows.push(['Move date:',d.moveDate]);
+  if(d.pickup)rows.push(['Pickup:',d.pickup]);
+  if(d.dropoff)rows.push(['Drop-off:',d.dropoff]);
+  var rowData=rows.map(function(r){
+    doc.setFont('helvetica','bold');doc.setFontSize(10.5);var lw=doc.getTextWidth(r[0]);
+    doc.setFont('helvetica','normal');
+    return{label:r[0],lw:lw,lines:doc.splitTextToSize(String(r[1]),W-2*M-12-lw)};
+  });
+  var boxH=rowData.reduce(function(a,r){return a+r.lines.length*5.6},0)+5;
+  doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);doc.setDrawColor(200,208,216);doc.setLineWidth(0.25);
+  doc.rect(M,y,W-2*M,boxH,'FD');
+  var cy=y+6;doc.setFontSize(10.5);
+  rowData.forEach(function(r){
+    doc.setTextColor(GREY[0],GREY[1],GREY[2]);doc.setFont('helvetica','bold');doc.text(r.label,M+4,cy);
+    doc.setTextColor(30,30,30);doc.setFont('helvetica','normal');doc.text(r.lines,M+4+r.lw+2,cy);
+    cy+=r.lines.length*5.6;
+  });
+  y+=boxH+9;
+  doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.setFont('helvetica','bold');doc.setFontSize(11.5);
+  doc.text('Pricing',M,y);y+=2.5;
+  var bandH=8.5,rowH=8;
+  doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(M,y,W-2*M,bandH,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(10.5);
+  doc.text(d.movers+' movers \u00b7 '+d.area,M+4,y+6);y+=bandH;
+  var items=[['Moving services',money2(d.hourly)+' / hour'],['Minimum ('+hrsLabel(d.hours)+')',money2(d.hourly*d.hours)],['Travel & service fee',money2(d.travel)]];
+  doc.setFontSize(10.5);
+  items.forEach(function(it,i){
+    if(i>0){doc.setDrawColor(215,222,229);doc.setLineWidth(0.25);doc.line(M,y,W-M,y)}
+    doc.setTextColor(30,30,30);doc.setFont('helvetica','normal');
+    doc.text(it[0],M+4,y+5.7);doc.text(it[1],W-M-4,y+5.7,{align:'right'});
+    y+=rowH;
+  });
+  doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);doc.rect(M,y,W-2*M,rowH+1,'F');
+  doc.setDrawColor(NAVY[0],NAVY[1],NAVY[2]);doc.setLineWidth(0.6);doc.line(M,y,W-M,y);
+  doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+  doc.text('Minimum booking total',M+4,y+6.2);
+  doc.text(money2(d.minimum)+' CAD',W-M-4,y+6.2,{align:'right'});
+  y+=rowH+1+7;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(GREY[0],GREY[1],GREY[2]);
+  doc.text(doc.splitTextToSize('Additional time beyond the minimum is billed at '+money2(d.hourly)+'/hour, based on exact time used.',W-2*M),M,y);
+  y+=8;
+  if(d.notes){
+    doc.setFontSize(10.5);doc.setTextColor(30,30,30);
+    doc.setFont('helvetica','bold');doc.text('Notes:',M,y);
+    var nlw=doc.getTextWidth('Notes: ');
+    doc.setFont('helvetica','normal');
+    var nlines=doc.splitTextToSize(d.notes,W-2*M-nlw-1);
+    doc.text(nlines,M+nlw+1,y);y+=nlines.length*5.2+6;
+  }
+  doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.setFont('helvetica','bold');doc.setFontSize(11.5);
+  doc.text('Payment Terms',M,y);y+=6.5;
+  doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(30,30,30);
+  doc.text('Payment is due after completion of the move. Accepted methods:',M,y);y+=6.5;
+  [['E-transfer','plus 5% GST'],['Credit card','3% card fee plus 5% GST'],['Cash','no GST added']].forEach(function(p){
+    doc.setFont('helvetica','bold');doc.text(p[0]+' ',M,y);
+    var pw=doc.getTextWidth(p[0]+' ');
+    doc.setFont('helvetica','normal');doc.text('\u2014 '+p[1],M+pw,y);y+=5.5;
+  });
+  y+=4;
+  if(y>222){doc.addPage();y=20}
+  doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.setFont('helvetica','bold');doc.setFontSize(11.5);
+  doc.text('Terms & Conditions',M,y);y+=6.5;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(30,30,30);
+  ['This quotation is valid for 14 days from the date of issue.',
+   'All prices are in Canadian dollars (CAD).',
+   'Payment is due after completion of the move. E-transfer and credit card payments are subject to 5% GST; credit card payments also carry a 3% card fee. Cash payments have no GST added.',
+   'Changes to the date, addresses, or scope of work may affect pricing.',
+   'To accept this quote, call '+d.phone+' or email '+d.email+'.'].forEach(function(t,i){
+    var lines=doc.splitTextToSize(t,W-2*M-9);
+    doc.text((i+1)+'.',M,y);doc.text(lines,M+9,y);y+=lines.length*5.2+2;
+  });
+  y+=5;
+  doc.setFontSize(10.5);
+  doc.text('Warm regards,',M,y);y+=5.5;
+  doc.setFont('helvetica','bold');doc.text('Nelson \u2014 Icando Movers & Transportation',M,y);
+  doc.setDrawColor(215,222,229);doc.setLineWidth(0.3);doc.line(M,270,W-M,270);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(GREY[0],GREY[1],GREY[2]);
+  doc.text('Icando Movers & Transportation  |  Winnipeg, MB  |  '+d.phone+'  |  '+d.email,W/2,274.5,{align:'center'});
+}
+$('q-pdf').addEventListener('click',function(){
+  var q=quoteCalc();
+  var md=$('q-movedate').value,moveDate='';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(md)){var p=md.split('-');moveDate=fmtDate(md)}
+  var d={quoteNo:nextQuoteNo(),issued:fmtUS(new Date()),validUntil:fmtUS(new Date(Date.now()+14*864e5)),
+    clientName:$('q-client').value.trim()||'—',area:qArea==='within'?'Within Winnipeg':'Outside Winnipeg',
+    movers:q.movers,hourly:q.hourly,hours:q.hours,travel:q.travel,minimum:q.minimum,
+    notes:$('q-notes').value.trim(),moveDate:moveDate,
+    pickup:$('q-pickup').value.trim(),dropoff:$('q-dropoff').value.trim(),
+    phone:state.settings.phone,email:state.settings.email};
+  rememberAddress(d.pickup);rememberAddress(d.dropoff);
+  loadJsPDF(function(){
+    try{
+      var doc=new window.jspdf.jsPDF({unit:'mm',format:'letter'});
+      buildQuotePDF(doc,d);
+      doc.save('Quotation-'+d.quoteNo+'.pdf');
+      toast('PDF quote downloaded');
+    }catch(e){toast('PDF failed — try again')}
+  });
+});
+
+/* crew roster */
+/* crew roster: database is the source of truth (synced from Connecteam);
+   local state.crew mirrors it so job checkboxes and reminders keep working offline */
+function syncCrewFromDb(){
+  if(!getManagerKeySilent())return Promise.resolve(false);
+  return apiCall('GET','/crew').then(function(list){
+    var active=(list||[]).filter(function(c){return c.active!==false});
+    if(!active.length)return false;
+    state.crew=active.map(function(c){return {name:c.name,phone:c.phone||'',email:c.email||'',address:c.address||'',notes:c.notes||'',pin:c.pin||'',login_token:c.login_token||'',username:c.username||'',db_id:c.id}});
+    save();renderCrew();return true;
+  }).catch(function(){return false});
+}
+function renderCrew(){var box=$('crewList');box.innerHTML='';if(!state.crew.length)box.innerHTML='<p class="meta">No crew yet — add your movers below.</p>';state.crew.forEach(function(c,i){var r=document.createElement('div');r.className='crew-row';var s=document.createElement('div');var nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;s.appendChild(nm);var ct=[c.phone,c.email].filter(function(x){return x}).join(' · ');if(ct){var m=document.createElement('div');m.className='meta';m.style.fontSize='.8rem';m.textContent=ct;s.appendChild(m)}var btns=document.createElement('div');btns.style.display='flex';btns.style.gap='8px';var e=document.createElement('button');e.className='btn small';e.textContent='Edit';e.addEventListener('click',function(){editCrew(i,r)});var lk=document.createElement('button');lk.className='btn small';lk.textContent='🔗 Link';lk.title='Staff app login link';lk.addEventListener('click',function(){crewLoginLink(c)});var d=document.createElement('button');d.className='btn small danger';d.textContent='Remove';d.addEventListener('click',function(){if(confirm('Remove '+c.name+'?')){removeCrew(i)}});btns.appendChild(e);btns.appendChild(lk);btns.appendChild(d);r.appendChild(s);r.appendChild(btns);box.appendChild(r)});renderCrewChecks();loadCrewStatus()}
+// Live clock-in status for the 5 active crew.
+var ACTIVE_CREW=['Derrick','Donatus','Noble','Paras','Stephen'];
+function loadCrewStatus(){
+  var box=$('crewStatus');if(!box)return;
+  var today=new Date().toISOString().slice(0,10);
+  Promise.all([
+    apiCall('GET','/clock-ins?date='+today).catch(function(){return []}),
+    apiCall('GET','/crew').catch(function(){return []})
+  ]).then(function(results){
+    var rows=results[0], crewList=results[1];
+    var status={};
+    ACTIVE_CREW.forEach(function(n){status[n]={in:null,out:null,lastLogin:null}});
+    (rows||[]).forEach(function(ci){
+      var n=ci.crew_name;
+      if(status[n]!==undefined){
+        if(ci.clock_in&&(!status[n].in||ci.clock_in>status[n].in))status[n].in=ci.clock_in;
+        if(ci.clock_out&&(!status[n].out||ci.clock_out>status[n].out))status[n].out=ci.clock_out;
+      }
+    });
+    (crewList||[]).forEach(function(c){
+      if(status[c.name]!==undefined){
+        if(c.last_login)status[c.name].lastLogin=c.last_login;
+        if(c.last_seen)status[c.name].lastSeen=c.last_seen;
+      }
+    });
+    var now=Date.now();
+    box.innerHTML=ACTIVE_CREW.map(function(n){
+      var s=status[n];
+      var clockedIn=s.in&&(!s.out||s.out<s.in);
+      var dot=clockedIn?'<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#4caf50;margin-right:8px"></span>':'<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ccc;margin-right:8px"></span>';
+      var clockTxt=clockedIn?'<span class="meta">in since '+fmtTimeWpg(s.in)+'</span>':(s.out?'<span class="meta">out at '+fmtTimeWpg(s.out)+'</span>':'<span class="meta">not clocked in today</span>');
+      // Live presence: active if seen in last 5 minutes.
+      var presence;
+      if(s.lastSeen&&(now-new Date(s.lastSeen).getTime())<5*60*1000){
+        presence='<span style="color:#2e7d32;font-weight:700">● Active now</span>';
+      } else if(s.lastSeen){
+        presence='<span class="meta">last seen '+timeAgo(s.lastSeen)+'</span>';
+      } else if(s.lastLogin){
+        presence='<span class="meta">last login '+timeAgo(s.lastLogin)+'</span>';
+      } else {
+        presence='<span style="color:#c62828;font-weight:700">never opened the app</span>';
+      }
+      return '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between">'
+        +'<div>'+dot+'<b>'+n+'</b></div>'
+        +'<div>'+clockTxt+'</div></div>'
+        +'<div style="margin-left:20px;margin-top:2px">📱 '+presence+'</div></div>';
+    }).join('');
+  }).catch(function(){box.innerHTML='<p class="meta">Could not load status</p>'});
+}
+function fmtTimeWpg(iso){
+  try{
+    var d=new Date(iso);
+    var h=d.getHours(),m=d.getMinutes(),ap=h>=12?'PM':'AM';h=h%12;if(h===0)h=12;
+    return h+':'+String(m).padStart(2,'0')+' '+ap;
+  }catch(e){return ''}
+}
+function fmtDateTimeWpg(iso){
+  try{
+    var d=new Date(iso);
+    return (d.getMonth()+1)+'/'+d.getDate()+' '+fmtTimeWpg(iso);
+  }catch(e){return ''}
+}
+function timeAgo(iso){
+  try{
+    var mins=Math.floor((Date.now()-new Date(iso).getTime())/60000);
+    if(mins<1)return 'just now';
+    if(mins<60)return mins+'m ago';
+    var hrs=Math.floor(mins/60);
+    if(hrs<24)return hrs+'h ago';
+    return Math.floor(hrs/24)+'d ago';
+  }catch(e){return ''}
+}
+function crewLoginLink(c){
+  var ensure=function(token){
+    var url='https://booking.icandomovers.ca/staff.html#t='+token;
+    var msg='Staff login link for '+c.name+':\n\n'+url+'\n\nText this to them once — they tap it, log in, and add the app to their home screen.';
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){toast('Login link copied — paste it in a text to '+c.name)}).catch(function(){prompt(msg,url)});
+    }else{prompt(msg,url)}
+  };
+  if(c.login_token){ensure(c.login_token);return}
+  // Generate a token server-side via PATCH (manager-key secured).
+  var token=Array.from(crypto.getRandomValues(new Uint8Array(24))).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+  if(c.db_id&&getManagerKeySilent()){
+    apiCall('PATCH','/crew/'+c.db_id,{login_token:token}).then(function(){
+      c.login_token=token;save();ensure(token);
+    }).catch(function(){toast('Could not create login link')});
+  }else{toast('Manager key needed — open the Leads tab once, then try again')}
+}
+function removeCrew(i){
+  var c=state.crew[i];
+  var done=function(){state.crew.splice(i,1);save();renderCrew();renderCrewChecks();toast('Crew updated')};
+  if(c.db_id&&getManagerKeySilent()){apiCall('DELETE','/crew/'+c.db_id).then(done).catch(function(){toast('Could not remove')})}
+  else done();
+}
+function editCrew(i,row){
+  var c=state.crew[i];row.innerHTML='';
+  var wrap=document.createElement('div');wrap.style.flex='1';
+  var n=document.createElement('input');n.value=c.name;n.placeholder='Full name';n.style.marginBottom='6px';
+  var p=document.createElement('input');p.type='tel';p.value=c.phone||'';p.placeholder='Phone (optional)';p.style.marginBottom='6px';
+  var em=document.createElement('input');em.type='email';em.value=c.email||'';em.placeholder='Email (optional)';em.style.marginBottom='6px';
+  var ad=document.createElement('input');ad.value=c.address||'';ad.placeholder='Home address (optional)';ad.style.marginBottom='6px';
+  var nt=document.createElement('input');nt.value=c.notes||'';nt.placeholder='Private notes — SIN, emergency contact…';nt.style.marginBottom='6px';
+  var pn=document.createElement('input');pn.value=c.pin||'';pn.placeholder='Login PIN (optional fallback)';pn.style.marginBottom='6px';pn.inputMode='numeric';
+  var un=document.createElement('input');un.value=c.username||'';un.placeholder='App username (e.g. derrick)';un.style.marginBottom='6px';un.autocapitalize='none';
+  var pw=document.createElement('input');pw.type='password';pw.value='';pw.placeholder=c.username?'New password (blank = keep current)':'Set app password';pw.style.marginBottom='8px';pw.autocomplete='new-password';
+  var btns=document.createElement('div');btns.style.display='flex';btns.style.gap='8px';
+  var sv=document.createElement('button');sv.className='btn small primary';sv.textContent='Save';
+  sv.addEventListener('click',function(){
+    var nn=n.value.trim();if(!nn){toast('Name is required');return}
+    var upd={name:nn,phone:p.value.trim(),email:em.value.trim(),address:ad.value.trim(),notes:nt.value.trim(),pin:pn.value.trim(),username:un.value.trim().toLowerCase()};
+    if(pw.value)upd.password=pw.value;
+    var apply=function(){var keep=Object.assign({db_id:c.db_id},upd);delete keep.password;state.crew[i]=keep;save();renderCrew();renderCrewChecks();toast('Crew updated')};
+    if(c.db_id&&getManagerKeySilent()){apiCall('PATCH','/crew/'+c.db_id,upd).then(apply).catch(function(){toast('Could not save')})}
+    else apply();
+  });
+  var cl=document.createElement('button');cl.className='btn small';cl.textContent='Cancel';
+  cl.addEventListener('click',function(){renderCrew()});
+  btns.appendChild(sv);btns.appendChild(cl);
+  wrap.appendChild(n);wrap.appendChild(p);wrap.appendChild(em);wrap.appendChild(ad);wrap.appendChild(nt);wrap.appendChild(pn);wrap.appendChild(un);wrap.appendChild(pw);wrap.appendChild(btns);
+  row.appendChild(wrap);
+}
+$('crewAdd').addEventListener('click',function(){
+  var n=$('crewName').value.trim();if(!n)return;
+  if(state.crew.find(function(c){return c.name===n})){toast('Already on the roster');return}
+  var rec={name:n,phone:$('crewPhone').value.trim(),email:$('crewEmail').value.trim()};
+  var apply=function(dbId){if(dbId)rec.db_id=dbId;state.crew.push(rec);save();renderCrew();$('crewName').value='';$('crewPhone').value='';$('crewEmail').value='';toast('Crew updated')};
+  if(getManagerKeySilent()){apiCall('POST','/crew',rec).then(function(r){apply(r&&r.id)}).catch(function(){apply(null)})}
+  else apply(null);
+});
+$('crewShare').addEventListener('click',function(){
+  if(!state.crew.length){toast('Roster is empty');return}
+  var lines=['[Crew roster dispatch — internal]','Type: Crew roster'];
+  state.crew.forEach(function(c){lines.push('- '+c.name+(c.phone?' | '+c.phone:'')+(c.email?' | '+c.email:''))});
+  location.href='mailto:'+encodeURIComponent(state.settings.email)+'?subject='+encodeURIComponent('[Dispatch] Crew roster')+'&body='+encodeURIComponent(lines.join('\n'));
+  toast('Roster email opened — just hit send');
+});
+
+/* settings */
+function fillSettings(){$('s-bookingBase').value=state.settings.bookingBase;$('s-schedulingBase').value=state.settings.schedulingBase;$('s-yard').value=state.settings.yardAddress;$('s-phone').value=state.settings.phone;$('s-email').value=state.settings.email;$('s-placesKey').value=state.settings.placesKey||''}
+$('s-save').addEventListener('click',function(){var keyBefore=state.settings.placesKey;state.settings.bookingBase=$('s-bookingBase').value.trim()||DEFAULTS.settings.bookingBase;state.settings.schedulingBase=$('s-schedulingBase').value.trim()||DEFAULTS.settings.schedulingBase;state.settings.yardAddress=$('s-yard').value.trim();state.settings.phone=$('s-phone').value.trim();state.settings.email=$('s-email').value.trim();state.settings.placesKey=$('s-placesKey').value.trim();save();$('j-yardAddress').value=state.settings.yardAddress;initPlaces();syncPull();toast('Settings saved');if(state.settings.placesKey!==keyBefore){setTimeout(function(){location.reload()},700);return}showTab('tab-dash')});
+
+/* web push notifications (service worker + VAPID; server endpoints are manager-key secured) */
+var VAPID_PUBLIC_KEY='BDrIexmy9hICnNn_URMoYAjJrkSGWNpTeiF00fdRGHrov_JA5fz-s__Kj2ZXWLVwdIQSNu2ptz2dbHSwgZQkhF8';
+var PUSH_TYPES=[['clock_in','Clock-ins'],['clock_out','Clock-outs'],['new_lead','New leads'],['job_done','Jobs completed'],['quote_quiet','Quote follow-ups due']];
+var PUSH_DEFAULT_PREFS={clock_in:true,clock_out:true,new_lead:true,job_done:true,quote_quiet:true};
+// Channel preferences: event types with labels for the channel picker.
+var CHANNEL_EVENTS=[
+  ['new_lead','New leads'],
+  ['crew_response','Crew accept/decline'],
+  ['crew_change_request','Release requests'],
+  ['clock_in','Clock-ins'],
+  ['clock_out','Clock-outs'],
+  ['job_done','Jobs completed'],
+  ['job_changed','Job changes'],
+  ['quote_quiet','Quote follow-ups due']
+];
+function loadChannelPrefs(){
+  var box=$('channel-prefs');if(!box)return;
+  apiCall('GET','/notification-prefs?owner_type=manager&owner_id=manager').then(function(prefs){
+    var html='<table style="width:100%;font-size:.9rem"><tr style="text-align:left;color:#666"><th>Event</th><th style="text-align:center">Push</th><th style="text-align:center">Email</th><th style="text-align:center">SMS</th></tr>';
+    CHANNEL_EVENTS.forEach(function(ev){
+      var key=ev[0],label=ev[1];
+      var p=prefs[key]||{push:true,email:false,sms:false};
+      html+='<tr style="border-top:1px solid #eee"><td style="padding:8px 4px">'+label+'</td>'
+        +'<td style="text-align:center"><input type="checkbox" data-ch="push" data-ev="'+key+'"'+(p.push?' checked':'')+'></td>'
+        +'<td style="text-align:center"><input type="checkbox" data-ch="email" data-ev="'+key+'"'+(p.email?' checked':'')+'></td>'
+        +'<td style="text-align:center"><input type="checkbox" data-ch="sms" data-ev="'+key+'"'+(p.sms?' checked':'')+'></td></tr>';
+    });
+    html+='</table>';
+    box.innerHTML=html;
+    box.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+      cb.addEventListener('change',function(){
+        var ev=cb.dataset.ev;
+        var row=cb.closest('tr');
+        var push=row.querySelector('[data-ch=push]').checked;
+        var email=row.querySelector('[data-ch=email]').checked;
+        var sms=row.querySelector('[data-ch=sms]').checked;
+        apiCall('PUT','/notification-prefs',{owner_type:'manager',owner_id:'manager',event_type:ev,channel_push:push,channel_email:email,channel_sms:sms})
+          .catch(function(){toast('Could not save');loadChannelPrefs()});
+      });
+    });
+  }).catch(function(){box.innerHTML='<p class="meta">Could not load — open the Leads tab once, then try again.</p>'});
+}
+function vapidToU8(b64url){
+  var b64=b64url.replace(/-/g,'+').replace(/_/g,'/');while(b64.length%4)b64+='=';
+  var raw=atob(b64),out=new Uint8Array(raw.length);
+  for(var i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);
+  return out;
+}
+function b64urlEncode(buf){
+  var bytes=new Uint8Array(buf),s='';
+  for(var i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function pushSupported(){return ('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window)}
+function pushEndpoint(){try{return localStorage.getItem('icando_push_endpoint')||''}catch(e){return ''}}
+function pushPrefs(){try{var p=JSON.parse(localStorage.getItem('icando_push_prefs')||'null');return p||Object.assign({},PUSH_DEFAULT_PREFS)}catch(e){return Object.assign({},PUSH_DEFAULT_PREFS)}}
+function savePushPrefs(p){try{localStorage.setItem('icando_push_prefs',JSON.stringify(p))}catch(e){}}
+function renderPushToggles(){
+  var box=$('push-toggles');if(!box)return;box.innerHTML='';
+  var prefs=pushPrefs(),enabled=!!pushEndpoint();
+  PUSH_TYPES.forEach(function(t){
+    var key=t[0],label=t[1];
+    var l=document.createElement('label');l.className='check';l.style.opacity=enabled?'1':'0.45';
+    var cb=document.createElement('input');cb.type='checkbox';cb.checked=!!prefs[key];cb.disabled=!enabled;
+    cb.addEventListener('change',function(){
+      if(!pushEndpoint())return;
+      var p=pushPrefs();p[key]=cb.checked;savePushPrefs(p);
+      apiCall('PATCH','/push-subscriptions',{endpoint:pushEndpoint(),prefs:p}).catch(function(){toast('Could not save preference')});
+    });
+    l.appendChild(cb);l.appendChild(document.createTextNode(label));box.appendChild(l);
+  });
+}
+function refreshPushUI(){
+  var st=$('push-status'),btn=$('push-toggle');if(!st||!btn)return;
+  if(!pushSupported()){st.textContent='This browser does not support push notifications.';btn.disabled=true;renderPushToggles();return}
+  var on=!!pushEndpoint();
+  st.textContent=on?'Notifications are on for this device. Toggle types below, or disable them entirely.':'Notifications are off. Enable to get clock-ins, leads, completions and quote alerts on this device.';
+  btn.textContent=on?'Disable notifications':'Enable notifications';
+  btn.classList.toggle('primary',!on);
+  renderPushToggles();
+}
+function enablePush(){
+  var btn=$('push-toggle');btn.disabled=true;
+  var done=function(){btn.disabled=false};
+  if(Notification.permission==='denied'){toast('Notifications are blocked — allow them in your browser settings first.');done();return}
+  var ask=Notification.permission==='granted'?Promise.resolve('granted'):Notification.requestPermission();
+  ask.then(function(perm){
+    if(perm!=='granted')throw{denied:true};
+    return navigator.serviceWorker.ready.then(function(reg){
+      return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:vapidToU8(VAPID_PUBLIC_KEY)});
+    });
+  }).then(function(sub){
+    return apiCall('POST','/push-subscriptions',{
+      endpoint:sub.endpoint,
+      p256dh:b64urlEncode(sub.getKey('p256dh')),
+      auth:b64urlEncode(sub.getKey('auth')),
+      prefs:pushPrefs()
+    }).then(function(){return sub});
+  }).then(function(sub){
+    try{localStorage.setItem('icando_push_endpoint',sub.endpoint)}catch(e){}
+    toast('Notifications enabled');refreshPushUI();done();
+  }).catch(function(err){
+    if(err&&err.denied)toast('Notification permission was not granted.');
+    else if(err&&err.auth)toast('Manager key needed — open the Leads tab once, then try again.');
+    else toast('Could not enable notifications. Check your connection.');
+    done();
+  });
+}
+function disablePush(){
+  var btn=$('push-toggle');btn.disabled=true;
+  var ep=pushEndpoint();
+  navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription().then(function(sub){return sub?sub.unsubscribe():true});
+  }).then(function(){
+    return ep?apiCall('DELETE','/push-subscriptions',{endpoint:ep}).catch(function(){}):null;
+  }).then(function(){
+    try{localStorage.removeItem('icando_push_endpoint')}catch(e){}
+    toast('Notifications disabled');refreshPushUI();
+  }).catch(function(){toast('Could not disable notifications.')})
+  .then(function(){btn.disabled=false});
+}
+$('push-toggle').addEventListener('click',function(){pushEndpoint()?disablePush():enablePush()});
+
+/* free address suggestions: your recent addresses + OpenStreetMap search (no key needed) */
+function recentAddresses(){var seen={},out=[];(state.addressHistory||[]).forEach(function(a){if(a&&!seen[a]){seen[a]=1;out.push(a)}});return out}
+function rememberAddress(a){a=(a||'').trim();if(!a)return;state.addressHistory=state.addressHistory||[];state.addressHistory=state.addressHistory.filter(function(x){return x!==a});state.addressHistory.unshift(a);state.addressHistory=state.addressHistory.slice(0,60);save()}
+var nominatimTimer={};
+function initFreeSuggest(){
+  ['b-pickup','b-dropoff','j-pickup','j-dropoff','j-yardAddress','q-pickup','q-dropoff'].forEach(function(id){
+    var input=$(id);if(!input||input.dataset.suggestOn||input.dataset.placesOn)return;input.dataset.suggestOn='1';
+    var drop=null;
+    function close(){if(drop){drop.remove();drop=null}}
+    function open(items){
+      close();if(!items.length)return;
+      drop=document.createElement('div');drop.className='addr-drop';
+      items.forEach(function(it){
+        var b=document.createElement('button');b.type='button';
+        b.innerHTML='<span class="src">'+esc(it.src)+'</span>'+esc(it.label);
+        b.addEventListener('mousedown',function(ev){ev.preventDefault();input.value=it.value;close()});
+        drop.appendChild(b);
+      });
+      var at=document.createElement('div');at.className='addr-attrib';at.textContent='Address search © OpenStreetMap contributors';drop.appendChild(at);
+      input.closest('.field').appendChild(drop);
+    }
+    input.addEventListener('focus',function(){
+      var q=input.value.trim().toLowerCase();
+      var rec=recentAddresses().filter(function(a){return !q||a.toLowerCase().indexOf(q)>-1}).slice(0,5).map(function(a){return{src:'Recent',label:a,value:a}});
+      open(rec);
+    });
+    input.addEventListener('input',function(){
+      var q=input.value.trim();
+      clearTimeout(nominatimTimer[id]);
+      if(q.length<4)return;
+      nominatimTimer[id]=setTimeout(function(){
+        fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=ca&q='+encodeURIComponent(q))
+          .then(function(r){return r.json()}).then(function(rows){
+            if(!Array.isArray(rows))return;
+            open(rows.map(function(r){var s=String(r.display_name||'').split(',').slice(0,3).join(',');return{src:'Search',label:s,value:r.display_name}}));
+          }).catch(function(){});
+      },450);
+    });
+    input.addEventListener('blur',function(){setTimeout(close,200)});
+  });
+}
+
+/* address autocomplete (Google Places) */
+function initPlaces(){
+  var key=(state.settings.placesKey||'').trim();
+  if(!key)return;
+  if(window.google&&window.google.maps&&window.google.maps.places&&window.google.maps.places.Autocomplete){attachPlaces();return}
+  if(document.querySelector('script[data-places]'))return;
+  window.icandoPlacesReady=function(){attachPlaces()};
+  var s=document.createElement('script');
+  s.setAttribute('data-places','1');
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(key)+'&libraries=places&callback=icandoPlacesReady';
+  s.async=true;s.defer=true;
+  document.head.appendChild(s);
+}
+function attachPlaces(){
+  if(!(window.google&&window.google.maps&&window.google.maps.places))return;
+  ['b-pickup','b-dropoff','j-pickup','j-dropoff','j-yardAddress','q-pickup','q-dropoff'].forEach(function(id){
+    var input=$(id);if(!input||input.dataset.placesOn)return;input.dataset.placesOn='1';
+    try{
+      var ac=new google.maps.places.Autocomplete(input,{componentRestrictions:{country:'ca'},fields:['formatted_address']});
+      ac.addListener('place_changed',function(){var p=ac.getPlace();if(p&&p.formatted_address)input.value=p.formatted_address});
+    }catch(e){}
+  });
+}
+
+/* app self-update: iOS home-screen apps don't revalidate the page, so check
+   version.json (no-store) on launch and whenever the app comes to the front.
+   Bump APP_VERSION + version.json on every deploy. */
+var APP_VERSION='2026-10-02w';
+var lastVerCheck=0;
+function hardReload(){window.location.href='manager.html?v='+Date.now()}
+function checkAppVersion(){
+  var now=Date.now();if(now-lastVerCheck<5*60*1000)return;lastVerCheck=now;
+  fetch('version.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){
+    if(d&&d.v&&d.v!==APP_VERSION)$('updateBar').hidden=false;
+  }).catch(function(){/* offline — try next time */});
+}
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState!=='visible')return;
+  renderDash();
+  try{syncPull()}catch(e){}
+  checkAppVersion();
+});
+
+/* profitability: revenue vs labor cost for completed jobs (operations database) */
+var profitYM=(function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')})();
+function profitRateFor(job,crewByName,avgRate){
+  var names=(job.crew||[]).map(function(c){return c.name}).filter(function(n){return n});
+  var rates=names.map(function(n){return crewByName[n]}).filter(function(r){return r>0});
+  if(rates.length)return rates.reduce(function(a,b){return a+b},0)/rates.length;
+  return avgRate;
+}
+function loadProfit(){
+  var st=$('profit-status');if(st)st.textContent='Loading…';
+  var last=profitYM+'-31';
+  Promise.all([apiCall('GET','/crew'),apiCall('GET','/jobs?from='+profitYM+'-01&to='+last)]).then(function(res){
+    var crew=res[0]||[],jobs=(res[1]||[]).filter(function(j){return j.status==='completed'});
+    renderProfitCrew(crew);renderProfitJobs(crew,jobs);
+    if(st)st.textContent='';
+  }).catch(function(err){
+    if(st)st.textContent=(err&&err.auth)?'Manager key needed — open the Leads tab once, then try again.':'Could not load profit data. Check your connection.';
+  });
+}
+function renderProfitCrew(crew){
+  $('profit-rates').innerHTML=crew.length?crew.map(function(c){
+    return '<div class="drow"><div class="dl">'+esc(c.name)+'</div><div class="dv"><input type="number" min="0" step="0.5" data-rate="'+c.id+'" value="'+(c.pay_rate==null?'':c.pay_rate)+'" placeholder="$/hr" style="width:90px"> <span class="meta">/hr</span></div></div>';
+  }).join(''):'<p class="meta">No crew found.</p>';
+}
+function renderProfitJobs(crew,jobs){
+  var byName={};crew.forEach(function(c){var r=parseFloat(c.pay_rate);if(r>0)byName[c.name]=r});
+  var allRates=crew.map(function(c){return parseFloat(c.pay_rate)}).filter(function(r){return r>0});
+  var avg=allRates.length?allRates.reduce(function(a,b){return a+b},0)/allRates.length:0;
+  var totR=0,totC=0;
+  var rows=jobs.map(function(j){
+    var rev=parseFloat(j.price)||0;totR+=rev;
+    var count=((j.crew||[]).length)||j.movers_count||2;
+    var rate=profitRateFor(j,byName,avg);
+    var hrs=j.actual_hours!=null?parseFloat(j.actual_hours):3;
+    var cost=hrs*count*rate;totC+=cost;
+    var margin=rev-cost;
+    return '<div class="card"><div class="row-badges"><span class="badge">Completed</span><span class="meta">'+esc(fmtDate(j.date))+'</span></div>'+
+      '<h3>'+esc(j.client_name||'?')+'</h3>'+
+      '<div class="drow"><div class="dl">Revenue</div><div class="dv">'+(rev?money(rev):'<span class="meta">no price set</span>')+'</div></div>'+
+      '<div class="drow"><div class="dl">Labor cost</div><div class="dv">'+money(Math.round(cost))+' <span class="meta">('+hrs+'h × '+count+' × '+money(rate)+'/hr)</span></div></div>'+
+      '<div class="drow"><div class="dl">Margin</div><div class="dv"><b>'+money(Math.round(margin))+'</b></div></div>'+
+      '<div class="drow"><div class="dl">Hours worked</div><div class="dv"><input type="number" min="0" step="0.5" data-hours="'+j.id+'" value="'+(j.actual_hours==null?'':j.actual_hours)+'" placeholder="est. 3" style="width:80px"></div></div>'+
+      '</div>';
+  }).join('');
+  var mpct=totR>0?Math.round((totR-totC)/totR*100):0;
+  $('profit-summary').innerHTML='<div class="month-nums"><div><b>'+money(Math.round(totR))+'</b><span>revenue</span></div><div><b>'+money(Math.round(totC))+'</b><span>labor cost</span></div><div><b>'+money(Math.round(totR-totC))+'</b><span>margin ('+mpct+'%)</span></div></div>'+
+    (avg?'':'<p class="hint">Set crew hourly rates above for accurate labor costs.</p>');
+  $('profit-jobs').innerHTML=rows||'<div class="card empty">No completed jobs this month.</div>';
+}
+document.addEventListener('change',function(e){
+  if(!e.target.getAttribute)return;
+  var ri=e.target.getAttribute('data-rate');
+  if(ri){var v=parseFloat(e.target.value);apiCall('PATCH','/crew/'+ri,{pay_rate:isNaN(v)?null:v}).then(function(){toast('Rate saved');loadProfit()}).catch(function(){toast('Could not save rate')});return}
+  var hi=e.target.getAttribute('data-hours');
+  if(hi){var h=parseFloat(e.target.value);apiCall('PATCH','/jobs/'+hi,{actual_hours:isNaN(h)?null:h}).then(function(){toast('Hours saved');loadProfit()}).catch(function(){toast('Could not save hours')});}
+});
+
+/* payroll: bi-weekly pay periods (Mon–Sun x 2) with daily detail,
+   weekly subtotals and period totals. Period 0 = Sep 21–Oct 4, 2026. */
+var PAY_ANCHOR=(function(){var d=new Date(2026,8,21);d.setHours(0,0,0,0);return d})();
+var payPeriodIdx=0;
+var payView='period'; // 'period' | 'month'
+var payMonth=(function(){var d=new Date();return {y:d.getFullYear(),m:d.getMonth()}})();
+function payPeriodRange(){var s=new Date(PAY_ANCHOR);s.setDate(s.getDate()+payPeriodIdx*14);var e=new Date(s);e.setDate(e.getDate()+13);return {s:s,e:e}}
+function payFmtDay(iso){var d=new Date(iso);return d.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}
+/* shared: fetch clock-ins + crew rates, filter to a range, dedup Connecteam-wins */
+function payData(s,e){
+  return Promise.all([apiCall('GET','/clock-ins'),apiCall('GET','/crew')]).then(function(res){
+    var rows=res[0]||[],crew=res[1]||[];
+    var byName={};crew.forEach(function(c){var rt=parseFloat(c.pay_rate);if(rt>0)byName[c.name]=rt});
+    var pEnd=new Date(e.getTime()+864e5);
+    var inR=rows.filter(function(x){var t=new Date(x.clock_in);return t>=s&&t<pEnd});
+    var ctDays={};
+    inR.forEach(function(x){if(x.source==='connecteam')ctDays[x.crew_name+'|'+String(x.clock_in).slice(0,10)]=1});
+    inR=inR.filter(function(x){return x.source==='connecteam'||!ctDays[x.crew_name+'|'+String(x.clock_in).slice(0,10)]});
+    return {rows:inR,byName:byName};
+  });
+}
+function paySummary(totH,totP,n){$('pay-summary').innerHTML='<div class="month-nums"><div><b>'+totH.toFixed(1)+'</b><span>hours</span></div><div><b>'+money(Math.round(totP*100)/100)+'</b><span>payroll</span></div><div><b>'+n+'</b><span>crew</span></div></div>'}
+function payErr(err){var st=$('pay-status');if(st)st.textContent=(err&&err.auth)?'Manager key needed — open the Leads tab once, then try again.':'Could not load payroll data. Check your connection.'}
+function loadPayroll(){
+  if(payView==='month')return loadPayrollMonth();
+  var st=$('pay-status');if(st)st.textContent='Loading…';
+  var r=payPeriodRange();
+  var w1e=new Date(r.s);w1e.setDate(w1e.getDate()+6);
+  var w2s=new Date(r.s);w2s.setDate(w2s.getDate()+7);
+  $('pay-week-label').textContent=fmtDate(r.s.toISOString().slice(0,10))+' – '+fmtDate(r.e.toISOString().slice(0,10));
+  payData(r.s,r.e).then(function(d){
+    var groups={};
+    d.rows.forEach(function(x){
+      var g=groups[x.crew_name]=groups[x.crew_name]||{name:x.crew_name,rows:[]};
+      g.rows.push(x);
+    });
+    var names=Object.keys(groups).sort();
+    var totH=0,totP=0;
+    function shiftRow(x){
+      var d=new Date(x.clock_in);
+      var src=x.source==='connecteam'?'📱':'🔗';
+      var inout=d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'})+(x.clock_out?' – '+new Date(x.clock_out).toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'}):' <span class="meta">(still in)</span>');
+      return '<div class="drow"><div class="dl">'+src+' '+esc(payFmtDay(x.clock_in))+'<br><span class="meta">'+inout+'</span></div>'+
+        '<div class="dv">'+(parseFloat(x.hours)||0).toFixed(2)+'h <button class="btn small" data-editclock="'+x.id+'">Edit</button> <button class="btn small danger" data-delclock="'+x.id+'">✕</button></div></div>';
+    }
+    function weekBlock(label,weekRows,rate){
+      var wh=weekRows.reduce(function(a,x){return a+(parseFloat(x.hours)||0)},0);
+      var wp=rate?wh*rate:0;
+      return '<div class="drow"><div class="dl"><b>'+label+'</b></div><div class="dv"><b>'+wh.toFixed(2)+'h</b>'+(rate?' · <b>'+money(Math.round(wp*100)/100)+'</b>':'')+'</div></div>'+
+        weekRows.map(shiftRow).join('');
+    }
+    // Weekly-paid crew: Derrick, Donatus, Paras. Others are bi-weekly.
+    var weeklyPaid=['derrick','donatus','paras'];
+    var html=names.map(function(n){
+      var g=groups[n];
+      g.rows.sort(function(a,b){return new Date(a.clock_in)-new Date(b.clock_in)});
+      var w1=g.rows.filter(function(x){return new Date(x.clock_in)<w2s});
+      var w2=g.rows.filter(function(x){return new Date(x.clock_in)>=w2s});
+      var ph=g.rows.reduce(function(a,x){return a+(parseFloat(x.hours)||0)},0);
+      var rate=d.byName[n]||0,pay=ph*rate;totH+=ph;totP+=pay;
+      var isWeekly=weeklyPaid.indexOf(n.toLowerCase())>=0;
+      var freqBadge=isWeekly?'<span class="badge" style="background:#e8f5e9;color:#2e7d32">Weekly</span>':'<span class="badge" style="background:#e3f2fd;color:#1565c0">Bi-weekly</span>';
+      return '<div class="card"><div class="row-badges"><span class="badge">'+esc(n)+'</span>'+freqBadge+'<span class="meta">'+ph.toFixed(2)+'h this period</span></div>'+
+        weekBlock('Week 1 ('+payFmtDay(r.s)+' – '+payFmtDay(w1e)+')',w1,rate)+
+        weekBlock('Week 2 ('+payFmtDay(w2s)+' – '+payFmtDay(r.e)+')',w2,rate)+
+        '<div class="drow"><div class="dl">Rate</div><div class="dv">'+(rate?money(rate)+'/hr':'<span class="meta">not set — see Profit tab</span>')+'</div></div>'+
+        '<div class="drow"><div class="dl">Period pay</div><div class="dv"><b>'+money(Math.round(pay*100)/100)+'</b></div></div></div>';
+    }).join('');
+    paySummary(totH,totP,names.length);
+    $('pay-crews').innerHTML=html||'<div class="card empty">No clock-ins this period yet.</div>';
+    if(st)st.textContent='';
+  }).catch(payErr);
+}
+/* monthly report: per-staff totals for records and expenses */
+function loadPayrollMonth(){
+  var st=$('pay-status');if(st)st.textContent='Loading…';
+  var s=new Date(payMonth.y,payMonth.m,1),e=new Date(payMonth.y,payMonth.m+1,0);
+  $('pay-week-label').textContent=s.toLocaleDateString('en-CA',{month:'long',year:'numeric'});
+  payData(s,e).then(function(d){
+    var groups={};
+    d.rows.forEach(function(x){
+      var g=groups[x.crew_name]=groups[x.crew_name]||{name:x.crew_name,hours:0,shifts:0};
+      g.hours+=parseFloat(x.hours)||0;g.shifts++;
+    });
+    var names=Object.keys(groups).sort();
+    var totH=0,totP=0;
+    var html=names.map(function(n){
+      var g=groups[n],rate=d.byName[n]||0,pay=g.hours*rate;totH+=g.hours;totP+=pay;
+      return '<div class="card"><div class="row-badges"><span class="badge">'+esc(n)+'</span><span class="meta">'+g.shifts+' shift'+(g.shifts===1?'':'s')+'</span></div>'+
+        '<div class="drow"><div class="dl">Hours</div><div class="dv"><b>'+g.hours.toFixed(2)+'</b></div></div>'+
+        '<div class="drow"><div class="dl">Rate</div><div class="dv">'+(rate?money(rate)+'/hr':'<span class="meta">not set — see Profit tab</span>')+'</div></div>'+
+        '<div class="drow"><div class="dl">Paid</div><div class="dv"><b>'+money(Math.round(pay*100)/100)+'</b></div></div></div>';
+    }).join('');
+    paySummary(totH,totP,names.length);
+    $('pay-crews').innerHTML=html||'<div class="card empty">No clock-ins this month yet.</div>';
+    if(st)st.textContent='';
+  }).catch(payErr);
+}
+document.addEventListener('click',function(e){
+  if(e.target&&e.target.id==='pay-prev'){
+    if(payView==='month'){payMonth.m--;if(payMonth.m<0){payMonth.m=11;payMonth.y--}}
+    else payPeriodIdx--;
+    loadPayroll();
+  }
+  if(e.target&&e.target.id==='pay-next'){
+    if(payView==='month'){payMonth.m++;if(payMonth.m>11){payMonth.m=0;payMonth.y++}}
+    else payPeriodIdx++;
+    loadPayroll();
+  }
+  if(e.target&&e.target.id==='pay-view-period'){payView='period';$('pay-view-period').className='btn small primary';$('pay-view-month').className='btn small';loadPayroll()}
+  if(e.target&&e.target.id==='pay-view-month'){payView='month';$('pay-view-month').className='btn small primary';$('pay-view-period').className='btn small';loadPayroll()}
+  var del=e.target&&e.target.getAttribute?e.target.getAttribute('data-delclock'):null;
+  if(del&&confirm('Delete this clock-in entry?')){apiCall('DELETE','/clock-ins/'+del).then(function(){toast('Entry deleted');loadPayroll()}).catch(function(){toast('Could not delete')})}
+  var edit=e.target&&e.target.getAttribute?e.target.getAttribute('data-editclock'):null;
+  if(edit){
+    var newIn=prompt('Clock-in time (YYYY-MM-DD HH:MM, 24h):');
+    if(newIn===null)return;
+    var newOut=prompt('Clock-out time (YYYY-MM-DD HH:MM, 24h) — leave blank if still clocked in:');
+    if(newOut===null)return;
+    var payload={};
+    if(newIn.trim())payload.clock_in=newIn.trim().replace(' ','T')+':00';
+    if(newOut.trim())payload.clock_out=newOut.trim().replace(' ','T')+':00';
+    if(!Object.keys(payload).length){toast('No changes');return}
+    apiCall('PATCH','/clock-ins/'+edit,payload).then(function(){toast('Clock time updated');loadPayroll()}).catch(function(){toast('Could not update')});
+  }
+});
+
+/* init */
+(function init(){
+  var today=new Date();var iso=today.toISOString().slice(0,10);
+  if(!$('b-date').value)$('b-date').value=iso;
+  if(!$('j-date').value)$('j-date').value=iso;
+  $('j-yardAddress').value=state.settings.yardAddress;
+  $('reloadBtn').onclick=hardReload;
+  $('updateBtn').onclick=hardReload;
+  $('dashSearch').addEventListener('input',function(e){dashQ=e.target.value;openComments=null;openDetail=null;renderDash();});
+  $('statusPills').addEventListener('click',function(e){
+    var b=e.target.closest('.pill');if(!b)return;
+    dashF=b.dataset.f;openComments=null;openDetail=null;
+    this.querySelectorAll('.pill').forEach(function(p){p.classList.toggle('on',p===b)});
+    renderDash();
+  });
+  renderDash();renderCrew();qCityOptions();qReset();quoteCalc();initPlaces();initFreeSuggest();
+  // Server-first: load jobs from API on startup.
+  DB.refresh().then(function(){ renderDash(); }).catch(function(){});
+  renderQuotes();syncQuotes();syncCrewFromDb();
+  // Deep link handler: #alerts[-job-<id>] opens the Alerts tab; #job-<id> opens job details.
+  // Called on load and on hashchange (for service worker navigations to an open app).
+  function handleDeepLink(){
+    try{
+      var hash=window.location.hash||'';
+      if(!hash) return;
+      var am=hash.match(/#alerts(?:-job-(\d+))?/);
+      if(am){
+        showTab('tab-notifs'); loadNotifications(); loadAcceptances();
+        if(am[1]){
+          setTimeout(function(){
+            var cards=document.querySelectorAll('#notif-list [data-notif]');
+            for(var i=0;i<cards.length;i++){
+              if((cards[i].textContent||'').indexOf('job#'+am[1])>-1){
+                cards[i].scrollIntoView({behavior:'smooth',block:'center'});
+                cards[i].style.outline='3px solid #f26522';cards[i].style.outlineOffset='4px';
+                (function(el){setTimeout(function(){el.style.outline=''},2500)})(cards[i]);
+                break;
+              }
+            }
+          },600);
+        }
+        try{history.replaceState(null,'',window.location.pathname)}catch(e){}
+        return;
+      }
+      var hm=hash.match(/#job-(\d+)/);
+      if(hm){
+        var targetId=hm[1];
+        dashF='all'; dashQ='';
+        var dq2=$('dash-q'); if(dq2) dq2.value='';
+        var found=DB.get(targetId);
+        if(found){
+          showTab('tab-dash'); openDetail=found.id; renderDash();
+          setTimeout(function(){loadJobResponses(found)},100);
+        } else {
+          // Fetch from API if not in local cache.
+          apiCall('GET','/jobs/'+targetId).then(function(j){
+            if(!j||!j.id) return;
+            var item=toViewJob(j);
+            if(!DB.get(j.id)) DB.jobs.push(item);
+            showTab('tab-dash'); openDetail=item.id; renderDash();
+            setTimeout(function(){loadJobResponses(item)},100);
+          }).catch(function(){});
+        }
+        try{history.replaceState(null,'',window.location.pathname)}catch(e){}
+      }
+    }catch(e){}
+  }
+  setTimeout(handleDeepLink, 800);
+  window.addEventListener('hashchange', function(){ setTimeout(handleDeepLink, 300); });
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){/* push unavailable */})}
+  checkAppVersion();
+  if($('profit-month')){$('profit-month').value=profitYM;$('profit-month').addEventListener('change',function(){profitYM=this.value||profitYM;loadProfit()})}
+  var ptb=document.querySelector('[data-tab="tab-profit"]');if(ptb)ptb.addEventListener('click',function(){loadProfit()});
+  var pyb=document.querySelector('[data-tab="tab-payroll"]');if(pyb)pyb.addEventListener('click',function(){loadPayroll()});
+  var ntb=document.querySelector('[data-tab="tab-notifs"]');if(ntb)ntb.addEventListener('click',function(){loadNotifications();loadAcceptances()});
+  var sctb=document.querySelector('[data-tab="tab-sched"]');if(sctb)sctb.addEventListener('click',function(){initSchedDate();loadSchedule()});
+// ---- Day schedule view ----
+var schedDate='';
+function initSchedDate(){
+  if(schedDate) return;
+  var d=new Date();
+  schedDate=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var inp=$('sched-date'); if(inp) inp.value=schedDate;
+}
+function schedShift(dstr, days){
+  var d=new Date(dstr+'T12:00:00');
+  d.setDate(d.getDate()+days);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtSchedTime(iso){
+  if(!iso) return '';
+  try{
+    // Handle "HH:MM" format directly (e.g. yard_meet stored as "08:30")
+    var hm=/^(\d{1,2}):(\d{2})(?::\d{2})?$/.exec(String(iso).trim());
+    if(hm){
+      var h=parseInt(hm[1],10), m=hm[2];
+      var ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12;
+      return h+':'+m+' '+ap;
+    }
+    var d=new Date(iso);
+    var h=d.getHours(), m=d.getMinutes();
+    if(isNaN(h)||isNaN(m)) return String(iso);
+    var ap=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12;
+    return h+':'+String(m).padStart(2,'0')+' '+ap;
+  }catch(e){ return ''; }
+}
+function loadSchedule(){
+  var box=$('sched-list'), st=$('sched-status');
+  if(!box) return;
+  var inp=$('sched-date'); if(inp&&inp.value) schedDate=inp.value;
+  if(!schedDate) initSchedDate();
+  $('sched-detail').style.display='none'; box.style.display='';
+  box.innerHTML='<p class="meta" style="text-align:center">Loading…</p>';
+  // Pull fresh from API so times/crew/responses are always current.
+  var jobsP=apiCall('GET','/jobs',null,true).catch(function(){ return null; });
+  var respP=apiCall('GET','/job-responses',null,true).catch(function(){ return null; });
+  Promise.all([jobsP,respP]).then(function(res){
+    var jobs=res[0];
+    if(!jobs){
+      // Fallback to DB cache.
+      jobs=DB.jobs.map(function(j){
+        return {id:j.api_id, client_name:j.client, date:j.date, start_time:j.start_time,
+          end_time:j.end_time, pickup:j.pickup, dropoff:j.dropoff, yard_meet:j.yard_meet,
+          status:j.status, crew:j.crew, client_phone:j.client_phone, notes:j.notes};
+      });
+    }
+    renderSchedJobs(jobs||[], res[1]||[]);
+  });
+  function renderSchedJobs(jobs, responses){
+    // Map job_id -> {crewNameLower: response}
+    var respByJob={};
+    responses.forEach(function(r){
+      var k=String(r.job_id);
+      (respByJob[k]=respByJob[k]||{})[String(r.crew_name||'').toLowerCase()]=r.response;
+    });
+    // Week strip: 7 days starting Monday of schedDate's week, with job dots.
+    renderWeekStrip(jobs);
+    var dayJobs=jobs.filter(function(j){
+      var jd=(j.date||'').slice(0,10);
+      return jd===schedDate && j.status!=='cancelled';
+    }).sort(function(a,b){ return (a.start_time||'').localeCompare(b.start_time||''); });
+    if(!dayJobs.length){
+      if(st) st.innerHTML='<p class="meta" style="text-align:center">No jobs this day.</p>';
+      box.innerHTML='';
+      return;
+    }
+    var unassigned=dayJobs.filter(function(j){ return !(j.crew||[]).length; });
+    if(st){
+      st.innerHTML=unassigned.length
+        ? '<div class="card" style="background:#fef3e2;border-color:#f5a623;margin-bottom:10px"><b>⚠️ '+unassigned.length+' job'+(unassigned.length>1?'s':'')+' need'+(unassigned.length>1?'':'s')+' crew assigned</b></div>'
+        : '<div class="card" style="background:#e8f5e9;border-color:#4caf50;margin-bottom:10px"><b style="color:#2e7d32">✓ All shifts are assigned!</b></div>';
+    }
+    box.innerHTML=dayJobs.map(function(j){
+      var rmap=respByJob[String(j.id)]||{};
+      var crewRows=(j.crew||[]).map(function(c){
+        var nm=typeof c==='string'?c:(c.name||'');
+        if(!nm) return '';
+        var resp=(rmap[nm.toLowerCase()]||'').toLowerCase();
+        var badge=resp==='accept'
+          ? '<span style="color:#2e7d32;font-weight:700">✓ Accepted</span>'
+          : resp==='reject'
+          ? '<span style="color:#c62828;font-weight:700">✕ Declined</span>'
+          : '<span style="color:#f5a623;font-weight:700">⏳ Waiting</span>';
+        return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0"><span>👷 '+esc(nm)+'</span>'+badge+'</div>';
+      }).filter(Boolean).join('');
+      var timeStr='';
+      if(j.start_time) timeStr+=fmtSchedTime(j.start_time);
+      if(j.end_time) timeStr+=' – '+fmtSchedTime(j.end_time);
+      var yardStr=j.yard_meet?('Yard: '+fmtSchedTime(j.yard_meet)+' · '):'';
+      return '<div class="card" style="margin-bottom:10px;cursor:pointer" data-sched-job="'+j.id+'">'
+        +'<div class="row-badges"><span class="badge">JOB</span>'
+        +'<span class="badge '+(j.status==='completed'?'green':'')+'">'+esc(j.status||'booked')+'</span></div>'
+        +'<h3 style="margin:4px 0">'+esc(j.client_name||'Unnamed')+'</h3>'
+        +'<p class="meta">'+yardStr+(timeStr||'Time TBD')+'</p>'
+        +(j.pickup?'<p class="meta">📍 '+esc(j.pickup)+'</p>':'')
+        +(j.dropoff?'<p class="meta">→ '+esc(j.dropoff)+'</p>':'')
+        +(crewRows?'<div style="margin-top:6px">'+crewRows+'</div>':'<p class="meta">👷 No crew assigned</p>')
+        +'<p class="meta" style="color:#f26522;margin-top:6px">tap to view details →</p>'
+        +'</div>';
+    }).join('');
+    // Cache day jobs for the detail view.
+    window._schedDayJobs={}; dayJobs.forEach(function(j){ window._schedDayJobs[String(j.id)]=j; });
+    window._schedRespByJob=respByJob;
+  }
+}
+function renderWeekStrip(jobs){
+  var strip=$('sched-weekstrip'); if(!strip) return;
+  // Monday of the current schedDate week.
+  var d=new Date(schedDate+'T12:00:00');
+  var dow=(d.getDay()+6)%7; // 0=Monday
+  d.setDate(d.getDate()-dow);
+  var todayStr=new Date().toISOString().slice(0,10);
+  var html='';
+  var dayNames=['M','T','W','T','F','S','S'];
+  for(var i=0;i<7;i++){
+    var dd=new Date(d); dd.setDate(d.getDate()+i);
+    var ds=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    var count=jobs.filter(function(j){ return (j.date||'').slice(0,10)===ds && j.status!=='cancelled'; }).length;
+    var isSel=ds===schedDate, isToday=ds===todayStr;
+    html+='<button class="btn small" data-weekday="'+ds+'" style="flex:1;padding:6px 2px;'
+      +(isSel?'background:#f26522;color:#fff;border-color:#f26522;':'')
+      +(isToday&&!isSel?'border:2px solid #f26522;':'')+'">'
+      +'<div style="font-size:.65rem">'+dayNames[i]+'</div>'
+      +'<div style="font-weight:700">'+dd.getDate()+'</div>'
+      +'<div style="font-size:.65rem">'+(count?('●'.repeat(Math.min(count,3))):'&nbsp;')+'</div>'
+      +'</button>';
+  }
+  strip.innerHTML=html;
+}
+function showSchedDetail(jobId){
+  var job=(window._schedDayJobs||{})[String(jobId)];
+  var box=$('sched-list'), det=$('sched-detail');
+  if(!job||!det) return;
+  box.style.display='none'; det.style.display='';
+  var rmap=(window._schedRespByJob||{})[String(jobId)]||{};
+  var crewRows=(job.crew||[]).map(function(c){
+    var nm=typeof c==='string'?c:(c.name||'');
+    if(!nm) return '';
+    var resp=(rmap[nm.toLowerCase()]||'').toLowerCase();
+    var badge=resp==='accept'
+      ? '<span style="color:#2e7d32;font-weight:700">✓ Accepted</span>'
+      : resp==='reject'
+      ? '<span style="color:#c62828;font-weight:700">✕ Declined</span>'
+      : '<span style="color:#f5a623;font-weight:700">⏳ Waiting</span>';
+    return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee"><span>👷 <b>'+esc(nm)+'</b></span>'+badge+'</div>';
+  }).filter(Boolean).join('');
+  var timeStr='';
+  if(job.start_time) timeStr+=fmtSchedTime(job.start_time);
+  if(job.end_time) timeStr+=' – '+fmtSchedTime(job.end_time);
+  det.innerHTML='<button class="btn small" id="sched-back" style="margin-bottom:10px">‹ Back to schedule</button>'
+    +'<div class="row-badges"><span class="badge">JOB #'+esc(String(jobId))+'</span>'
+    +'<span class="badge '+(job.status==='completed'?'green':'')+'">'+esc(job.status||'booked')+'</span></div>'
+    +'<h3 style="margin:6px 0">'+esc(job.client_name||'Unnamed')+'</h3>'
+    +(job.client_phone?'<p class="meta">📞 <a href="tel:'+esc(job.client_phone)+'">'+esc(job.client_phone)+'</a></p>':'')
+    +'<div style="margin:10px 0;padding:10px;background:#f8f9fa;border-radius:8px">'
+    +(job.yard_meet?'<p style="margin:4px 0">🏗️ <b>Yard meet:</b> '+esc(fmtSchedTime(job.yard_meet))+'</p>':'')
+    +(job.start_time?'<p style="margin:4px 0">🕐 <b>Pickup time:</b> '+esc(fmtSchedTime(job.start_time))+'</p>':'')
+    +(timeStr?'<p style="margin:4px 0">⏱️ <b>Hours:</b> '+esc(timeStr)+'</p>':'')
+    +(job.pickup?'<p style="margin:4px 0">📍 <b>Pickup:</b> '+esc(job.pickup)+'</p>':'')
+    +(job.dropoff?'<p style="margin:4px 0">→ <b>Drop-off:</b> '+esc(job.dropoff)+'</p>':'')
+    +'</div>'
+    +'<h4 style="margin:8px 0 4px">Crew</h4>'
+    +(crewRows||'<p class="meta">No crew assigned</p>')
+    +(job.notes||job.schedule_note||job.special_instructions?'<h4 style="margin:10px 0 4px">Notes</h4><p class="meta">'+esc(job.notes||job.schedule_note||job.special_instructions)+'</p>':'')
+    +'<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="btn small" data-sched-edit="'+jobId+'">✏️ Edit job</button>'
+    +(job.client_phone?'<a class="btn small" href="sms:'+esc(job.client_phone)+'" style="text-decoration:none">💬 Text client</a>':'')
+    +'</div>';
+  det.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function openLocalBookingEdit(item){
+  // Edit a local booking (stored in localStorage, not yet in DB)
+  var formHtml='<div style="padding:16px;max-width:500px">'
+    +'<h3 style="margin:0 0 12px">✏️ Edit Booking — '+esc(item.client||'')+'</h3>'
+    +'<div style="display:grid;gap:10px">'
+    +'<label style="display:block"><span class="meta">Client name</span><input type="text" id="eb-client" value="'+esc(item.client||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Date</span><input type="date" id="eb-date" value="'+esc(item.date||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Time</span><input type="text" id="eb-time" value="'+esc(item.time||item.pickupTime||'')+'" placeholder="e.g. 9:00 AM" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Pickup</span><input type="text" id="eb-pickup" value="'+esc(item.pickup||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Drop-off</span><input type="text" id="eb-dropoff" value="'+esc(item.dropoff||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Phone</span><input type="text" id="eb-phone" value="'+esc(item.phone||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Notes</span><textarea id="eb-notes" rows="3" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px">'+esc(item.notes||'')+'</textarea></label>'
+    +'<div style="display:flex;gap:8px"><button class="btn primary" id="eb-save">💾 Save</button><button class="btn" id="eb-cancel">Cancel</button></div>'
+    +'</div></div>';
+  // Show in a modal-like overlay
+  var ov=document.createElement('div');
+  ov.id='edit-booking-overlay';
+  ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto';
+  ov.innerHTML='<div style="background:#fff;border-radius:12px;max-width:540px;width:100%;margin-top:40px">'+formHtml+'</div>';
+  document.body.appendChild(ov);
+  document.getElementById('eb-cancel').addEventListener('click', function(){ document.body.removeChild(ov); });
+  ov.addEventListener('click', function(e){ if(e.target===ov) document.body.removeChild(ov); });
+  document.getElementById('eb-save').addEventListener('click', function(){
+    item.client=document.getElementById('eb-client').value;
+    item.date=document.getElementById('eb-date').value;
+    item.time=document.getElementById('eb-time').value;
+    item.pickup=document.getElementById('eb-pickup').value;
+    item.dropoff=document.getElementById('eb-dropoff').value;
+    item.phone=document.getElementById('eb-phone').value;
+    item.notes=document.getElementById('eb-notes').value;
+    save(); renderDash();
+    document.body.removeChild(ov);
+    toast('Booking updated');
+  });
+}
+function showSchedEditForm(jobId, job, returnTab){
+  var det=$('sched-detail');
+  if(!det) return;
+  // Extract time values (handle both "HH:MM" and ISO formats)
+  function toTimeInput(v){
+    if(!v) return '';
+    var m=/^(\d{1,2}):(\d{2})/.exec(String(v).trim());
+    if(m) return String(m[1]).padStart(2,'0')+':'+m[2];
+    try{ var d=new Date(v); if(!isNaN(d.getTime())) return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }catch(e){}
+    return '';
+  }
+  function toDateInput(v){
+    if(!v) return '';
+    var m=/^(\d{4}-\d{2}-\d{2})/.exec(String(v));
+    if(m) return m[1];
+    try{ var d=new Date(v); if(!isNaN(d.getTime())) return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }catch(e){}
+    return '';
+  }
+  det.innerHTML='<button class="btn small" id="sched-back" style="margin-bottom:10px">‹ Back</button>'
+    +'<h3 style="margin:6px 0">✏️ Edit Job #'+esc(String(jobId))+' — '+esc(job.client_name||'')+'</h3>'
+    +'<div style="display:grid;gap:10px;max-width:500px">'
+    +'<label style="display:block"><span class="meta">Date</span><input type="date" id="ej-date" value="'+esc(toDateInput(job.date))+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Yard meet time</span><input type="time" id="ej-yard" value="'+esc(toTimeInput(job.yard_meet))+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Pickup time</span><input type="time" id="ej-start" value="'+esc(toTimeInput(job.start_time))+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Pickup address</span><input type="text" id="ej-pickup" value="'+esc(job.pickup||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Drop-off address</span><input type="text" id="ej-dropoff" value="'+esc(job.dropoff||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Notes</span><textarea id="ej-notes" rows="3" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px">'+esc(job.notes||job.special_instructions||'')+'</textarea></label>'
+    +'<div style="display:flex;gap:8px"><button class="btn primary" id="ej-save">💾 Save changes</button><button class="btn" id="sched-back2">Cancel</button></div>'
+    +'</div>';
+  det.scrollIntoView({behavior:'smooth',block:'start'});
+  $('ej-save').addEventListener('click', function(){
+    var patch={};
+    var d=$('ej-date').value; if(d) patch.date=d;
+    var y=$('ej-yard').value; if(y) patch.yard_meet=y;
+    var s=$('ej-start').value; if(s) patch.start_time=d?d+'T'+s+':00':s;
+    patch.pickup=$('ej-pickup').value;
+    patch.dropoff=$('ej-dropoff').value;
+    patch.special_instructions=$('ej-notes').value;
+    var btn=$('ej-save'); btn.disabled=true; btn.textContent='Saving…';
+    apiCall('PATCH','/jobs/'+jobId,patch).then(function(){
+      toast('Job updated');
+      if(returnTab==='dash'){
+        showTab('tab-dash'); renderDash();
+      }else{
+        loadSchedule();
+        setTimeout(function(){ showSchedDetail(jobId); }, 500);
+      }
+    }).catch(function(){ btn.disabled=false; btn.textContent='💾 Save changes'; toast('Could not save — try again'); });
+  });
+}
+document.addEventListener('click',function(e){
+  if(e.target.closest('#sched-prev')){ initSchedDate(); schedDate=schedShift(schedDate,-1); $('sched-date').value=schedDate; loadSchedule(); return; }
+  if(e.target.closest('#sched-next')){ initSchedDate(); schedDate=schedShift(schedDate,1); $('sched-date').value=schedDate; loadSchedule(); return; }
+  if(e.target.closest('#sched-week-prev')){ initSchedDate(); schedDate=schedShift(schedDate,-7); $('sched-date').value=schedDate; loadSchedule(); return; }
+  if(e.target.closest('#sched-week-next')){ initSchedDate(); schedDate=schedShift(schedDate,7); $('sched-date').value=schedDate; loadSchedule(); return; }
+  if(e.target.closest('#sched-today')){ schedDate=''; initSchedDate(); $('sched-date').value=schedDate; loadSchedule(); return; }
+  var wd=e.target.closest('[data-weekday]');
+  if(wd){ schedDate=wd.dataset.weekday; $('sched-date').value=schedDate; loadSchedule(); return; }
+  if(e.target.closest('#sched-back')){ $('sched-detail').style.display='none'; $('sched-list').style.display=''; return; }
+  if(e.target.closest('#sched-back2')){ var sd=$('sched-detail'); if(sd){ sd.style.display='none'; $('sched-list').style.display=''; } return; }
+  var se=e.target.closest('[data-sched-edit]');
+  if(se){
+    var jobId=se.dataset.schedEdit;
+    var job=(window._schedDayJobs||{})[String(jobId)];
+    if(!job){ toast('Job not found'); return; }
+    showSchedEditForm(jobId, job);
+    return;
+  }
+  var sc=e.target.closest('[data-sched-job]');
+  if(sc){ showSchedDetail(sc.dataset.schedJob); return; }
+});
+var schedDateInput=document.getElementById('sched-date');
+if(schedDateInput) schedDateInput.addEventListener('change',function(){ schedDate=this.value; loadSchedule(); });
+  var cwb=document.querySelector('[data-tab="tab-crew"]');if(cwb)cwb.addEventListener('click',function(){syncCrewFromDb()});
+// ---- Notifications inbox ----
+function notifTime(iso){try{return new Date(iso).toLocaleString('en-CA',{timeZone:'America/Winnipeg',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}catch(e){return''}}
+function loadNotifications(){
+  var box=$('notif-list'),st=$('notif-status');
+  if(!box)return; box.innerHTML='<p class="meta" style="text-align:center">Loading…</p>';
+  apiCall('GET','/notifications?limit=100').then(function(rows){
+    if(!rows||!rows.length){box.innerHTML='<p class="meta" style="text-align:center">No notifications yet.</p>';if(st)st.textContent='';return}
+    box.innerHTML=rows.map(function(n){
+      var hot=(n.type==='crew_change_request'||n.type==='crew_response')?'🔥 ':'';
+      var jm=(n.body||'').match(/\[job#(\d+)\]/);
+      var jobAttr=jm?(' data-notif-job="'+jm[1]+'" style="margin-bottom:8px;padding:10px 12px;cursor:pointer"'):' style="margin-bottom:8px;padding:10px 12px"';
+      // Release requests get Accept / Decline buttons.
+      var isRelease=n.type==='crew_change_request'&&(n.title||'').indexOf('release request')>-1&&jm;
+      var actions='';
+      if(isRelease){
+        var crewM=(n.title||'').match(/release request:\s*([^\s—–-]+)/);
+        var crewName=crewM?crewM[1].trim():'';
+        actions='<div style="margin-top:8px;display:flex;gap:8px">'
+          +'<button class="btn small" data-release-accept="'+n.id+'" data-job="'+jm[1]+'" data-crew="'+esc(crewName)+'" style="background:#e8f5e9;border-color:#4caf50;color:#2e7d32;font-weight:700">✓ Accept release</button>'
+          +'<button class="btn small" data-release-decline="'+n.id+'" data-job="'+jm[1]+'" data-crew="'+esc(crewName)+'" style="background:#ffebee;border-color:#ef5350;color:#c62828;font-weight:700">✕ Decline</button>'
+          +'</div>';
+      }
+      return '<div class="card"'+jobAttr+' data-notif="'+n.id+'">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+        +'<div><b>'+hot+esc(n.title||n.type)+'</b><br><span class="meta">'+esc(n.body||'')+'</span><br><span class="meta" style="font-size:.75rem">'+notifTime(n.created_at)+(jm?' · <span style="color:#f26522">tap to view job →</span>':'')+'</span>'+actions+'</div>'
+        +'<button class="btn small" data-notif-del="'+n.id+'" title="Trash">🗑</button>'
+        +'</div></div>';
+    }).join('');
+    if(st)st.textContent=rows.length+' notification'+(rows.length===1?'':'s');
+  }).catch(function(){box.innerHTML='<p class="meta" style="text-align:center">Could not load — open the Leads tab once, then try again.</p>'});
+}
+function loadAcceptances(){
+  var box=$('resp-list'); if(!box)return;
+  box.innerHTML='<p class="meta" style="text-align:center">Loading…</p>';
+  apiCall('GET','/job-responses').then(function(rows){
+    if(!rows||!rows.length){box.innerHTML='<p class="meta" style="text-align:center">No crew responses yet.</p>';return}
+    var byJob={};
+    rows.forEach(function(r){
+      var k=r.job_id;
+      (byJob[k]=byJob[k]||{client:r.client_name,date:r.date,rows:[]}).rows.push(r);
+    });
+    box.innerHTML=Object.keys(byJob).sort(function(a,b){return (byJob[a].date||'').localeCompare(byJob[b].date||'')}).map(function(k){
+      var g=byJob[k];
+      var d=g.date?String(g.date).slice(0,10):'';
+      return '<div class="card" style="margin-bottom:8px;padding:10px 12px"><b>'+esc(g.client||('Job '+k))+'</b> <span class="meta">'+d+'</span>'
+        +g.rows.map(function(r){
+          var icon=r.response==='accept'?'✅':(r.response==='reject'?'❌':'❓');
+          return '<div style="margin-top:4px">'+icon+' '+esc(r.crew_name)+(r.reason?' — <span class="meta">'+esc(r.reason)+'</span>':'')+'</div>';
+        }).join('')+'</div>';
+    }).join('');
+  }).catch(function(){box.innerHTML='<p class="meta" style="text-align:center">Could not load.</p>'});
+}
+document.addEventListener('click',function(e){
+  var del=e.target.closest('[data-notif-del]');
+  if(del){
+    var id=del.dataset.notifDel;
+    if(!confirm('Trash this notification?'))return;
+    apiCall('DELETE','/notifications/'+id).then(function(){loadNotifications()}).catch(function(){toast('Could not delete')});
+    return;
+  }
+  // Accept a crew release request: remove them from the job, notify them.
+  var acc=e.target.closest('[data-release-accept]');
+  if(acc){
+    var notifId=acc.dataset.releaseAccept, jobId=acc.dataset.job, crewName=acc.dataset.crew;
+    if(!confirm('Accept '+crewName+'\'s release? They will be removed from this job.'))return;
+    acc.disabled=true; acc.textContent='Working…';
+    apiCall('GET','/jobs/'+jobId).then(function(j){
+      if(!j||!j.id) throw new Error('Job not found');
+      var crew=(j.crew||[]).filter(function(c){
+        var nm=typeof c==='string'?c:(c.name||'');
+        return nm.toLowerCase()!==crewName.toLowerCase();
+      });
+      return apiCall('PATCH','/jobs/'+jobId,{crew:crew}).then(function(){ return j; });
+    }).then(function(j){
+      // Notify the crew member.
+      return apiCall('POST','/notify-crew',{type:'job_assigned',title:'Release accepted',body:'Your release request for '+(j.client_name||'the job')+' was accepted. You are no longer on this job.',crew_name:crewName,job_id:jobId}).catch(function(){}).then(function(){
+        // Trash the request notification.
+        return apiCall('DELETE','/notifications/'+notifId).catch(function(){});
+      });
+    }).then(function(){
+      toast('Release accepted — '+crewName+' removed');
+      DB.refresh().then(function(){ loadNotifications(); });
+      // Offer to assign a replacement.
+      setTimeout(function(){
+        if(confirm('Assign a replacement for this job now?')){
+          // Open the job detail so manager can edit crew.
+          apiCall('GET','/jobs/'+jobId).then(function(j){
+            if(j&&j.id){
+              var item=toViewJob(j);
+              showTab('tab-dash'); openDetail=item.id; renderDash();
+            }
+          });
+        }
+      }, 500);
+    }).catch(function(){ toast('Could not process — try again'); acc.disabled=false; acc.textContent='✓ Accept release'; });
+    return;
+  }
+  // Decline a crew release request: they stay on the job, notify them.
+  var dec=e.target.closest('[data-release-decline]');
+  if(dec){
+    var notifId2=dec.dataset.releaseDecline, jobId2=dec.dataset.job, crewName2=dec.dataset.crew;
+    if(!confirm('Decline '+crewName2+'\'s release? They will stay assigned to this job.'))return;
+    dec.disabled=true; dec.textContent='Working…';
+    apiCall('GET','/jobs/'+jobId2).then(function(j){
+      var cn=j?(j.client_name||'the job'):'the job';
+      return apiCall('POST','/notify-crew',{type:'job_assigned',title:'Release declined',body:'Your release request for '+cn+' was declined. You are still assigned — please contact your manager if this is a problem.',crew_name:crewName2,job_id:jobId2}).catch(function(){});
+    }).then(function(){
+      return apiCall('DELETE','/notifications/'+notifId2).catch(function(){});
+    }).then(function(){
+      toast('Release declined — '+crewName2+' notified');
+      loadNotifications();
+    }).catch(function(){ toast('Could not process — try again'); dec.disabled=false; dec.textContent='✕ Decline'; });
+    return;
+  }
+  // Tap a notification card to jump to its job (not on action buttons).
+  var nc=e.target.closest('[data-notif-job]');
+  if(nc&&!e.target.closest('[data-notif-del]')&&!e.target.closest('[data-release-accept]')&&!e.target.closest('[data-release-decline]')){
+    var jid=nc.dataset.notifJob;
+    // Reset dashboard filter/search so the job is guaranteed visible.
+    dashF='all'; dashQ='';
+    var dq=$('dash-q'); if(dq) dq.value='';
+    // Try DB cache first, fall back to API fetch.
+    var found=DB.get(jid);
+    if(found){
+      showTab('tab-dash'); openDetail=found.id; renderDash();
+      setTimeout(function(){
+        loadJobResponses(found);
+        // Scroll to the job card.
+        var el=document.querySelector('[data-id="'+found.id+'"]');
+        if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+      },100);
+    } else {
+      toast('Loading job…');
+      apiCall('GET','/jobs/'+jid).then(function(j){
+        if(!j||!j.id){ toast('Job not found'); return; }
+        var item=toViewJob(j);
+        if(!DB.get(j.id)) DB.jobs.push(item);
+        showTab('tab-dash'); openDetail=item.id; renderDash();
+        setTimeout(function(){
+          loadJobResponses(item);
+          var el=document.querySelector('[data-id="'+item.id+'"]');
+          if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+        },100);
+      }).catch(function(){ toast('Could not load job'); });
+    }
+    return;
+  }
+  if(e.target.closest('#notif-refresh')){loadNotifications();return}
+  if(e.target.closest('#resp-refresh')){loadAcceptances();return}
+  if(e.target.closest('#notif-clear')){
+    if(!confirm('Trash ALL notifications?'))return;
+    apiCall('GET','/notifications?limit=500').then(function(rows){
+      var ids=(rows||[]).map(function(n){return n.id});
+      return Promise.all(ids.map(function(id){return apiCall('DELETE','/notifications/'+id).catch(function(){})}));
+    }).then(function(){loadNotifications();toast('Cleared')}).catch(function(){toast('Could not clear')});
+    return;
+  }
+});
+})();
+})();
+</script>
+</body>
+</html>
