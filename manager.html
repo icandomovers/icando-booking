@@ -846,7 +846,11 @@ document.addEventListener('click',function(e){
       apiCall('GET','/jobs/'+eItem.api_id).then(function(j){
         if(!j||!j.id){ toast('Job not found'); return; }
         openJobEditModal(j);
-      }).catch(function(){ toast('Could not load job'); });
+      }).catch(function(err){
+        if(err&&err.auth){ toast('Session expired — please re-enter your manager key'); }
+        else if(err&&err.http===404){ toast('Job not found in database'); }
+        else { toast('Could not load job — check your connection'); }
+      });
     }else{
       toast('Only database jobs can be edited (not local bookings)');
     }
@@ -2419,7 +2423,11 @@ document.addEventListener('click',function(e){
           var el=document.querySelector('[data-id="'+item.id+'"]');
           if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
         },100);
-      }).catch(function(){ toast('Could not load job'); });
+      }).catch(function(err){
+        if(err&&err.auth){ toast('Session expired — please re-enter your manager key'); }
+        else if(err&&err.http===404){ toast('Job not found in database'); }
+        else { toast('Could not load job — check your connection'); }
+      });
     }
     return;
   }
