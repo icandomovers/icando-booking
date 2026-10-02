@@ -841,33 +841,11 @@ document.addEventListener('click',function(e){
       return;
     }
     if(eItem.api_id){
-      // It's a job in the DB — fetch full details and open edit form
+      // It's a job in the DB — fetch full details and open edit modal
       toast('Loading job…');
       apiCall('GET','/jobs/'+eItem.api_id).then(function(j){
         if(!j||!j.id){ toast('Job not found'); return; }
-        // Open in schedule edit form (reuse the same UI)
-        showTab('tab-sched');
-        setTimeout(function(){
-          // Create a temporary job object in the schedule format
-          var tmpJob={
-            client_name: j.client_name||eItem.client,
-            date: j.date,
-            yard_meet: j.yard_meet,
-            start_time: j.start_time,
-            pickup: j.pickup,
-            dropoff: j.dropoff,
-            notes: j.special_instructions||j.notes,
-            special_instructions: j.special_instructions,
-            crew: j.crew
-          };
-          // Store for the edit form
-          if(!window._schedDayJobs) window._schedDayJobs={};
-          window._schedDayJobs['edit-'+j.id]=tmpJob;
-          // Show the edit form directly
-          var det=$('sched-detail'), box=$('sched-list');
-          if(box) box.style.display='none';
-          if(det){ det.style.display=''; showSchedEditForm(j.id, tmpJob, 'dash'); }
-        }, 300);
+        openJobEditModal(j);
       }).catch(function(){ toast('Could not load job'); });
     }else{
       toast('Only database jobs can be edited (not local bookings)');
@@ -2142,6 +2120,52 @@ function showSchedDetail(jobId){
     +(job.client_phone?'<a class="btn small" href="sms:'+esc(job.client_phone)+'" style="text-decoration:none">💬 Text client</a>':'')
     +'</div>';
   det.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function openJobEditModal(j){
+  function toTimeInput(v){
+    if(!v) return '';
+    var m=/^(\d{1,2}):(\d{2})/.exec(String(v).trim());
+    if(m) return String(m[1]).padStart(2,'0')+':'+m[2];
+    try{ var d=new Date(v); if(!isNaN(d.getTime())) return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }catch(e){}
+    return '';
+  }
+  function toDateInput(v){
+    if(!v) return '';
+    var m=/^(\d{4}-\d{2}-\d{2})/.exec(String(v));
+    if(m) return m[1];
+    try{ var d=new Date(v); if(!isNaN(d.getTime())) return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }catch(e){}
+    return '';
+  }
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.innerHTML='<div style="background:#fff;border-radius:12px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto">'
+    +'<h3 style="margin:0 0 12px">Edit Job #'+esc(String(j.id))+' &mdash; '+esc(j.client_name||'')+'</h3>'
+    +'<div style="display:grid;gap:10px">'
+    +'<label style="display:block"><span class="meta">Date</span><input type="date" id="jem-date" value="'+esc(toDateInput(j.date))+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Yard meet time</span><input type="time" id="jem-yard" value="'+esc(toTimeInput(j.yard_meet))+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Pickup time</span><input type="time" id="jem-start" value="'+esc(toTimeInput(j.start_time))+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Pickup address</span><input type="text" id="jem-pickup" value="'+esc(j.pickup||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Drop-off address</span><input type="text" id="jem-dropoff" value="'+esc(j.dropoff||'')+'" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"></label>'
+    +'<label style="display:block"><span class="meta">Notes</span><textarea id="jem-notes" rows="3" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px">'+esc(j.special_instructions||j.notes||'')+'</textarea></label>'
+    +'<div style="display:flex;gap:8px"><button class="btn primary" id="jem-save">Save changes</button><button class="btn" id="jem-cancel">Cancel</button></div>'
+    +'</div></div>';
+  document.body.appendChild(overlay);
+  var close=function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); };
+  $('jem-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) close(); });
+  $('jem-save').addEventListener('click', function(){
+    var patch={};
+    var d=$('jem-date').value; if(d) patch.date=d;
+    var y=$('jem-yard').value; if(y) patch.yard_meet=y;
+    var s=$('jem-start').value; if(s) patch.start_time=d?d+'T'+s+':00':s;
+    patch.pickup=$('jem-pickup').value;
+    patch.dropoff=$('jem-dropoff').value;
+    patch.special_instructions=$('jem-notes').value;
+    var btn=$('jem-save'); btn.disabled=true; btn.textContent='Saving...';
+    apiCall('PATCH','/jobs/'+j.id,patch).then(function(){
+      toast('Job updated'); close(); renderDash();
+    }).catch(function(){ btn.disabled=false; btn.textContent='Save changes'; toast('Could not save'); });
+  });
 }
 function openLocalBookingEdit(item){
   // Edit a local booking (stored in localStorage, not yet in DB)
