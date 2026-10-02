@@ -122,7 +122,7 @@ exports.handler = async (event) => {
     }
   ];
   const taxableSubtotal = Math.round((movingAmount + travelFee) * 100) / 100;
-  const notes = [`Icando Movers & Transportation \u2014 job ${job_id}`, client_name ? `Client: ${client_name}` : null].filter(Boolean).join("\n");
+  const notes = [`Icando Movers & Transportation \u2014 job ${job_id}`, client_name ? `Client: ${client_name}` : null, `E-transfer: info@icandomovers.ca`].filter(Boolean).join("\n");
   const gst = Math.round(taxableSubtotal * 0.05 * 100) / 100;
   lineItems.push({
     sku: "GST",
