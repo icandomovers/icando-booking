@@ -941,7 +941,7 @@ function completeBooking(item){
   // Ask how the client is paying: invoice only for Card / E-transfer, never for Cash.
   pickPaymentMethod(function(method){
     if(method==='cash'){
-      apiCall('PATCH','/jobs/'+item.api_id,{payment_method:'cash'},true).catch(function(){});
+      apiCall('PATCH','/jobs/'+item.api_id,{payment_method:'cash',payment_status:'paid'},true).catch(function(){});
       done(); return;
     }
     // Card or e-transfer: create the Helcim invoice for the thank-you email.
@@ -962,9 +962,14 @@ function completeBooking(item){
             item.paymentLink=inv.payment_url;save();
             apiCall('PATCH','/jobs/'+item.api_id,{payment_link:inv.payment_url,payment_method:method},true).catch(function(){});
             toast('Helcim invoice created — payment link added to the email');
+          } else {
+            toast('⚠️ Invoice failed: '+(inv&&inv.error?inv.error:'no payment link')+' — email will send without a link');
           }
           done();
-        }).catch(function(){ done(); });
+        }).catch(function(err){
+          toast('⚠️ Invoice creation failed — email will send without a payment link');
+          done();
+        });
     }).catch(function(){ done(); });
   });
 }
