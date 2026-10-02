@@ -384,9 +384,6 @@ function loadJobs(){
       if(j.started_at&&!j.ended_at&&j.status!=='cancelled'){
         h+='<button class="btn small" data-act="end" data-id="'+j.id+'">End job</button>';
       }
-      if(j.price&&j.payment_status!=='paid'&&j.ended_at){
-        h+='<button class="btn small primary" data-act="collect" data-id="'+j.id+'">Collect payment</button>';
-      }
       h+='</div></div>';
       return h;
     }).join('');
@@ -441,7 +438,7 @@ $('jobList').addEventListener('click',function(e){
       var body={}; if(pos){body.lat=pos.lat;body.lng=pos.lng}
       return apiCrew('POST','/crew/me/jobs/'+id+'/end',body);
     }).then(function(r){
-      toast('Job ended'+(r.billable_hours?' · '+Number(r.billable_hours).toFixed(2)+'h':'')+(r.amount?' · $'+Number(r.amount).toFixed(2):'')+' — manager notified');
+      toast('Job ended'+(r.billable_hours?' · '+Number(r.billable_hours).toFixed(2)+'h':'')+' — manager notified');
       setTimeout(function(){
         if(confirm('⏰ Remember to CLOCK OUT when you\'re back at the yard (or at drop-off if heading home).\n\nTap OK to clock out now, or Cancel to do it later.')) {
           showTab('tab-clock');
@@ -449,15 +446,6 @@ $('jobList').addEventListener('click',function(e){
       }, 800);
       loadJobs();
     }).catch(function(err){b.disabled=false;b.textContent='End job';toast((err&&err.msg)||'Could not end the job — try again')});
-  }else if(act==='collect'){
-    b.disabled=true; b.textContent='Preparing…';
-    apiCrew('POST','/crew/me/collect',{job_id:+id}).then(function(r){
-      b.disabled=false; b.textContent='Collect payment';
-      if(r.payment_url){
-        toast('Show this page to the customer so they can pay');
-        window.open(r.payment_url,'_blank');
-      }else toast('Payment link is not ready yet');
-    }).catch(function(err){b.disabled=false;b.textContent='Collect payment';toast((err&&err.msg)||'Payment is not ready — your manager sets the amount first')});
   }
 });
 
