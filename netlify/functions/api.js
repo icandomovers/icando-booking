@@ -13405,7 +13405,7 @@ exports.handler = async (event) => {
       const cols = f.filter((k) => body[k] !== void 0);
       const r = await p.query(
         `INSERT INTO jobs (${cols.join(",")}) VALUES (${cols.map((_, i) => `$${i + 1}`).join(",")}) RETURNING *`,
-        cols.map((k) => typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k])
+        cols.map((k) => body[k] === null ? null : typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k])
       );
       await p.query(`INSERT INTO audit_log (actor, action, entity, entity_id) VALUES ('manager','create','job',$1)`, [r.rows[0].id]);
       return json(201, r.rows[0]);
@@ -13418,7 +13418,7 @@ exports.handler = async (event) => {
       if (!cols.length) return json(400, { error: "nothing to update" });
       const r = await p.query(
         `UPDATE jobs SET ${cols.map((k, i) => `${k}=$${i + 1}`).join(",")}, updated_at=now() WHERE id=$${cols.length + 1} RETURNING *`,
-        [...cols.map((k) => typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k]), id]
+        [...cols.map((k) => body[k] === null ? null : typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k]), id]
       );
       await p.query(`INSERT INTO audit_log (actor, action, entity, entity_id, detail) VALUES ('manager','update','job',$1,$2)`, [id, JSON.stringify(cols)]);
       const updated = r.rows[0] || {};
@@ -13645,7 +13645,7 @@ exports.handler = async (event) => {
       const cols = f.filter((k) => body[k] !== void 0);
       const r = await p.query(
         `INSERT INTO clients (${cols.join(",")}) VALUES (${cols.map((_, i) => `$${i + 1}`).join(",")}) RETURNING *`,
-        cols.map((k) => typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k])
+        cols.map((k) => body[k] === null ? null : typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k])
       );
       return json(201, r.rows[0]);
     }
@@ -13660,7 +13660,7 @@ exports.handler = async (event) => {
         `INSERT INTO quotes (${cols.join(",")}) VALUES (${cols.map((_, i) => `$${i + 1}`).join(",")})
          ON CONFLICT (quote_no) DO UPDATE SET ${cols.filter((c) => c !== "quote_no").map((k, i) => `${k}=$${i + 1}`).join(",")}
          RETURNING *`,
-        cols.map((k) => typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k])
+        cols.map((k) => body[k] === null ? null : typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k])
       );
       return json(201, r.rows[0]);
     }
@@ -13670,7 +13670,7 @@ exports.handler = async (event) => {
       const cols = allowed.filter((k) => body[k] !== void 0);
       const r = await p.query(
         `UPDATE quotes SET ${cols.map((k, i) => `${k}=$${i + 1}`).join(",")} WHERE id=$${cols.length + 1} RETURNING *`,
-        [...cols.map((k) => typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k]), m[1]]
+        [...cols.map((k) => body[k] === null ? null : typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k]), m[1]]
       );
       return json(200, r.rows[0] || {});
     }
