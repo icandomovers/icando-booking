@@ -843,7 +843,7 @@ document.addEventListener('click',function(e){
     if(eItem.api_id){
       // It's a job in the DB — fetch full details and open edit modal
       toast('Loading job…');
-      apiCall('GET','/jobs/'+eItem.api_id).then(function(j){
+      apiCall('GET','/jobs/'+eItem.api_id,null,true).then(function(j){
         if(!j||!j.id){ toast('Job not found'); return; }
         openJobEditModal(j);
       }).catch(function(err){
