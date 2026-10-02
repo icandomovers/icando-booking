@@ -101,23 +101,33 @@ exports.handler = async (event) => {
   const rounded = Math.round(total * 100) / 100;
   const invNumber = (invoice_number || `ICANDO-${job_id}`).toString().slice(0, 50);
 
-  // Deposit mode: simple single-line invoice, no GST split.
+  // Deposit mode: single line + GST breakdown, no travel fee.
   if (action === "deposit") {
+    const gstAmt = Math.round(rounded * 0.05 * 100) / 100;
+    const depositNotes = [`Icando Movers & Transportation \u2014 booking deposit, job ${job_id}`, client_name ? `Client: ${client_name}` : null, `E-transfer: info@icandomovers.ca`].filter(Boolean).join("\n");
+    const depositItems = [
+      {
+        sku: "DEPOSIT",
+        description: description || `Booking deposit \u2014 job ${job_id}`,
+        quantity: 1,
+        price: rounded,
+        total: rounded
+      },
+      {
+        sku: "GST",
+        description: "GST (5%)",
+        quantity: 1,
+        price: gstAmt,
+        total: gstAmt
+      }
+    ];
     const depositBody = {
       invoiceNumber: invNumber,
       type: "INVOICE",
       status: "DUE",
       currency: "CAD",
-      notes: [`Icando Movers & Transportation \u2014 booking deposit, job ${job_id}`, client_name ? `Client: ${client_name}` : null, `E-transfer: info@icandomovers.ca`].filter(Boolean).join("\n"),
-      lineItems: [
-        {
-          sku: "DEPOSIT",
-          description: description || `Booking deposit \u2014 job ${job_id}`,
-          quantity: 1,
-          price: rounded,
-          total: rounded
-        }
-      ]
+      notes: depositNotes,
+      lineItems: depositItems
     };
     // Attach customer email so Helcim can send the invoice.
     if (client_email) depositBody.customerEmail = client_email;
