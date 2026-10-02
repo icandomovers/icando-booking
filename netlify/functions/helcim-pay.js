@@ -100,6 +100,40 @@ exports.handler = async (event) => {
   }
   const rounded = Math.round(total * 100) / 100;
   const invNumber = (invoice_number || `ICANDO-${job_id}`).toString().slice(0, 50);
+
+  // Deposit mode: simple single-line invoice, no GST split.
+  if (action === "deposit") {
+    const depositBody = {
+      invoiceNumber: invNumber,
+      type: "INVOICE",
+      status: "DUE",
+      currency: "CAD",
+      notes: [`Icando Movers & Transportation \u2014 booking deposit, job ${job_id}`, client_name ? `Client: ${client_name}` : null, `E-transfer: info@icandomovers.ca`].filter(Boolean).join("\n"),
+      lineItems: [
+        {
+          sku: "DEPOSIT",
+          description: description || `Booking deposit \u2014 job ${job_id}`,
+          quantity: 1,
+          price: rounded,
+          total: rounded
+        }
+      ]
+    };
+    // Attach customer email so Helcim can send the invoice.
+    if (client_email) depositBody.customerEmail = client_email;
+    const dr = await helcimFetch("/invoices", { method: "POST", token, body: depositBody });
+    if (!dr.ok) {
+      return json(502, { error: helcimErrorMessage(dr.data, dr.status) });
+    }
+    const dinv = dr.data || {};
+    return json(200, {
+      ok: true,
+      invoice_id: dinv.invoiceId,
+      invoice_number: dinv.invoiceNumber || invNumber,
+      payment_url: dinv.token ? `https://${subdomain}.myhelcim.com/order/?token=${dinv.token}` : null
+    });
+  }
+
   const movers = Number(movers_count) === 3 ? 3 : 2;
   const hourlyRate = movers === 3 ? 165 : 120;
   const travelFee = movers === 3 ? 165 : 120;
